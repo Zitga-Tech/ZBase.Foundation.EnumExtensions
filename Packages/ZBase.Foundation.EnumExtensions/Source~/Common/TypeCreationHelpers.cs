@@ -251,10 +251,12 @@ namespace ZBase.Foundation.SourceGen
                 }
             }
 
-            syntaxTreeSourceBuilder.WriteLine(usings.ToFullString());
+            syntaxTreeSourceBuilder.Write(usings.ToFullString());
+            syntaxTreeSourceBuilder.Write(NEWLINE);
             syntaxTreeSourceBuilder.Write(start);
-            syntaxTreeSourceBuilder.WriteLine(generatedSyntax);
-            syntaxTreeSourceBuilder.Write(end.ToString());
+            syntaxTreeSourceBuilder.Write(generatedSyntax);
+            syntaxTreeSourceBuilder.Write(NEWLINE);
+            syntaxTreeSourceBuilder.Write(end.Replace("\r\n", NEWLINE).ToString());
             syntaxTreeSourceBuilder.Flush();
 
             // Output as source

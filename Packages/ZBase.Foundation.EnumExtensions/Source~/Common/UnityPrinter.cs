@@ -114,7 +114,7 @@ namespace ZBase.Foundation.SourceGen
         /// <summary>
         /// The current output of the printer.
         /// </summary>
-        public string Result => builder.ToString();
+        public string Result => builder.Replace("\r\n", NEWLINE).ToString();
 
         /// <summary>
         /// Clear the output of the printer and reset indent

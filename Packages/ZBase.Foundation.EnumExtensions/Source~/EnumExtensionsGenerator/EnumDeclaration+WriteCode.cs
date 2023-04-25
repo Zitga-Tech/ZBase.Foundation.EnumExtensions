@@ -5,6 +5,7 @@ namespace ZBase.Foundation.EnumExtensions
     partial class EnumDeclaration
     {
         private const string AGGRESSIVE_INLINING = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]";
+        private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.EnumExtensions.EnumExtensionsGenerator\", \"1.0.1\")]";
 
         public string WriteCode()
         {
@@ -23,7 +24,7 @@ namespace ZBase.Foundation.EnumExtensions
 
                 p.PrintEndLine();
 
-                p.PrintLine("[global::System.Runtime.CompilerServices.CompilerGenerated]");
+                p.PrintLine(GENERATED_CODE);
                 p.PrintBeginLine();
                 {
                     if (IsPublic)
@@ -448,6 +449,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintEndLine();
                     }
 
+                    p.PrintLine(GENERATED_CODE);
                     p.PrintLine("public static class Values");
                     p.OpenScope();
                     {
@@ -481,6 +483,7 @@ namespace ZBase.Foundation.EnumExtensions
 
                     p.PrintEndLine();
 
+                    p.PrintLine(GENERATED_CODE);
                     p.PrintLine("public static class UnderlyingValues");
                     p.OpenScope();
                     {
@@ -514,6 +517,7 @@ namespace ZBase.Foundation.EnumExtensions
 
                     p.PrintEndLine();
 
+                    p.PrintLine(GENERATED_CODE);
                     p.PrintLine("public static class Names");
                     p.OpenScope();
                     {
@@ -559,6 +563,7 @@ namespace ZBase.Foundation.EnumExtensions
                     }
                     p.CloseScope();
 
+                    p.PrintLine(GENERATED_CODE);
                     p.PrintLine("public static class DisplayNames");
                     p.OpenScope();
                     {
@@ -615,6 +620,7 @@ namespace ZBase.Foundation.EnumExtensions
                     {
                         p.PrintEndLine();
 
+                        p.PrintLine(GENERATED_CODE);
                         p.PrintLine("public static class FixedNames");
                         p.OpenScope();
                         {
@@ -680,6 +686,7 @@ namespace ZBase.Foundation.EnumExtensions
 
                         p.PrintEndLine();
 
+                        p.PrintLine(GENERATED_CODE);
                         p.PrintLine("public static class FixedDisplayNames");
                         p.OpenScope();
                         {
