@@ -5,7 +5,8 @@ namespace ZBase.Foundation.EnumExtensions
     partial class EnumDeclaration
     {
         private const string AGGRESSIVE_INLINING = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]";
-        private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.EnumExtensions.EnumExtensionsGenerator\", \"1.0.1\")]";
+        private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.EnumExtensions.EnumExtensionsGenerator\", \"1.0.2\")]";
+        private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
 
         public string WriteCode()
         {
@@ -24,7 +25,7 @@ namespace ZBase.Foundation.EnumExtensions
 
                 p.PrintEndLine();
 
-                p.PrintLine(GENERATED_CODE);
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                 p.PrintBeginLine();
                 {
                     if (IsPublic)
@@ -42,6 +43,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// The number of members in the enum.");
                     p.PrintLine("/// This is a non-distinct count of defined names.");
                     p.PrintLine("/// </summary>");
+                    p.PrintLine(GENERATED_CODE);
                     p.PrintLine($"public const int Length = {Names.Count};");
 
                     p.PrintEndLine();
@@ -54,7 +56,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// </summary>");
                     p.PrintLine("/// <param name=\"value\">The value to retrieve the string value for</param>");
                     p.PrintLine("/// <returns>The string representation of the value</returns>");
-                    p.PrintLine(AGGRESSIVE_INLINING);
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine($"public static string ToStringFast(this {FullyQualifiedName} value)");
                     p = p.IncreasedIndent();
                     p.PrintLine("=> DisplayNames.Get(value);");
@@ -72,7 +74,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintLine("/// </summary>");
                         p.PrintLine("/// <param name=\"value\">The value to retrieve the string value for</param>");
                         p.PrintLine("/// <returns>The fixed string representation of the value</returns>");
-                        p.PrintLine(AGGRESSIVE_INLINING);
+                        p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                         p.PrintLine($"public static {FixedStringTypeName} ToFixedStringFast(this {FullyQualifiedName} value)");
                         p = p.IncreasedIndent();
                         p.PrintLine("=> FixedDisplayNames.Get(value);");
@@ -81,6 +83,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintEndLine();
                     }
 
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine("public static bool TryFormat(");
                     p = p.IncreasedIndent();
                     {
@@ -132,6 +135,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// </summary>");
                     p.PrintLine("/// <param name=\"value\">The value to check if it's defined</param>");
                     p.PrintLine("/// <returns><c>true</c> if the value exists in the enumeration, <c>false</c> otherwise</returns>");
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine($"public static bool IsDefined(this {FullyQualifiedName} value)");
                     p = p.IncreasedIndent();
                     {
@@ -156,7 +160,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// </summary>");
                     p.PrintLine("/// <param name=\"name\">The name to check if it's defined</param>");
                     p.PrintLine("/// <returns><c>true</c> if a member with the name exists in the enumeration, <c>false</c> otherwise</returns>");
-                    p.PrintLine(AGGRESSIVE_INLINING);
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine("public static bool IsDefined(string name)");
                     p = p.IncreasedIndent();
                     p.PrintLine("=> IsDefined(name, allowMatchingMetadataAttribute: false);");
@@ -173,6 +177,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// <param name=\"allowMatchingMetadataAttribute\">If <c>true</c>, considers the value of metadata attributes,otherwise ignores them</param>");
                     p.PrintLine("/// <returns><c>true</c> if a member with the name exists in the enumeration, or a member is decorated");
                     p.PrintLine("/// with a <c>[Display]</c> attribute with the name, <c>false</c> otherwise</returns>");
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine("public static bool IsDefined(string name, bool allowMatchingMetadataAttribute)");
                     p.OpenScope();
                     {
@@ -224,7 +229,7 @@ namespace ZBase.Foundation.EnumExtensions
 
                     p.PrintEndLine();
 
-                    p.PrintLine(AGGRESSIVE_INLINING);
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine($"public static {UnderlyingTypeName} ToUnderlyingValue(this {FullyQualifiedName} value)");
                     p = p.IncreasedIndent();
                     p.PrintLine($"=> ({UnderlyingTypeName})value;");
@@ -244,7 +249,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// If the parse operation fails, contains the default value of the underlying type");
                     p.PrintLine($"/// of <see cref=\"{FullyQualifiedName}\" />. This parameter is passed uninitialized.</param>");
                     p.PrintLine("/// <returns><c>true</c> if the value parameter was converted successfully; otherwise, <c>false</c>.</returns>");
-                    p.PrintLine(AGGRESSIVE_INLINING);
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine($"public static bool TryParse(string name, out {FullyQualifiedName} value)");
                     p = p.IncreasedIndent();
                     p.PrintLine("=> TryParse(name, out value, false, false);");
@@ -265,7 +270,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine($"/// of <see cref=\"{FullyQualifiedName}\" />. This parameter is passed uninitialized.</param>");
                     p.PrintLine("/// <param name=\"ignoreCase\"><c>true</c> to read value in case insensitive mode; <c>false</c> to read value in case sensitive mode.</param>");
                     p.PrintLine("/// <returns><c>true</c> if the value parameter was converted successfully; otherwise, <c>false</c>.</returns>");
-                    p.PrintLine(AGGRESSIVE_INLINING);
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine($"public static bool TryParse(string name, out {FullyQualifiedName} value, bool ignoreCase)");
                     p = p.IncreasedIndent();
                     p.PrintLine("=> TryParse(name, out value, ignoreCase, false);");
@@ -288,6 +293,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// <param name=\"allowMatchingMetadataAttribute\">If <c>true</c>, considers the value included in metadata attributes such as");
                     p.PrintLine("/// <c>[Display]</c> attribute when parsing, otherwise only considers the member names.</param>");
                     p.PrintLine("/// <returns><c>true</c> if the value parameter was converted successfully; otherwise, <c>false</c>.</returns>");
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine($"public static bool TryParse(string name, out {FullyQualifiedName} value, bool ignoreCase, bool allowMatchingMetadataAttribute)");
                     p.OpenScope();
                     {
@@ -437,6 +443,7 @@ namespace ZBase.Foundation.EnumExtensions
 
                     if (ReferenceUnityCollections)
                     {
+                        p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                         p.PrintLine($"private static {FixedStringTypeName} ToFixedString({UnderlyingTypeName} value)");
                         p.OpenScope();
                         {
@@ -449,7 +456,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintEndLine();
                     }
 
-                    p.PrintLine(GENERATED_CODE);
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine("public static class Values");
                     p.OpenScope();
                     {
@@ -465,14 +472,14 @@ namespace ZBase.Foundation.EnumExtensions
 
                         p.PrintEndLine();
 
-                        p.PrintLine(AGGRESSIVE_INLINING);
+                        p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                         p.PrintLine($"public static global::System.ReadOnlyMemory<{FullyQualifiedName}> AsMemory() => s_values;");
                         
                         if (ReferenceUnityCollections)
                         {
                             p.PrintEndLine();
 
-                            p.PrintLine(AGGRESSIVE_INLINING);
+                            p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                             p.PrintLine($"public static global::Unity.Collections.NativeArray<{FullyQualifiedName}>.ReadOnly AsNativeArray(global::Unity.Collections.Allocator allocator)");
                             p = p.IncreasedIndent();
                             p.PrintLine($"=> new global::Unity.Collections.NativeArray<{FullyQualifiedName}> (s_values, allocator).AsReadOnly();");
@@ -483,7 +490,7 @@ namespace ZBase.Foundation.EnumExtensions
 
                     p.PrintEndLine();
 
-                    p.PrintLine(GENERATED_CODE);
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine("public static class UnderlyingValues");
                     p.OpenScope();
                     {
@@ -499,14 +506,14 @@ namespace ZBase.Foundation.EnumExtensions
 
                         p.PrintEndLine();
 
-                        p.PrintLine(AGGRESSIVE_INLINING);
+                        p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                         p.PrintLine($"public static global::System.ReadOnlyMemory<{UnderlyingTypeName}> AsMemory() => s_values;");
 
                         if (ReferenceUnityCollections)
                         {
                             p.PrintEndLine();
 
-                            p.PrintLine(AGGRESSIVE_INLINING);
+                            p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                             p.PrintLine($"public static global::Unity.Collections.NativeArray<{UnderlyingTypeName}>.ReadOnly AsNativeArray(global::Unity.Collections.Allocator allocator)");
                             p = p.IncreasedIndent();
                             p.PrintLine($"=> new global::Unity.Collections.NativeArray<{UnderlyingTypeName}> (s_values, allocator).AsReadOnly();");
@@ -517,16 +524,16 @@ namespace ZBase.Foundation.EnumExtensions
 
                     p.PrintEndLine();
 
-                    p.PrintLine(GENERATED_CODE);
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine("public static class Names");
                     p.OpenScope();
                     {
                         foreach (var (key, _) in Names)
                         {
+                            p.PrintLine(GENERATED_CODE);
                             p.PrintLine($"public const string {key} = nameof({FullyQualifiedName}.{key});");
+                            p.PrintEndLine();
                         }
-
-                        p.PrintEndLine();
 
                         p.PrintLine($"private static readonly string[] s_names = new string[]");
                         p.OpenScope();
@@ -540,11 +547,12 @@ namespace ZBase.Foundation.EnumExtensions
 
                         p.PrintEndLine();
 
-                        p.PrintLine(AGGRESSIVE_INLINING);
+                        p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                         p.PrintLine("public static global::System.ReadOnlyMemory<string> AsMemory() => s_names;");
 
                         p.PrintEndLine();
 
+                        p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                         p.PrintLine($"public static string Get({FullyQualifiedName} value)");
                         p = p.IncreasedIndent();
                         p.PrintLine("=> value switch");
@@ -563,12 +571,16 @@ namespace ZBase.Foundation.EnumExtensions
                     }
                     p.CloseScope();
 
-                    p.PrintLine(GENERATED_CODE);
+                    p.PrintEndLine();
+
+                    p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                     p.PrintLine("public static class DisplayNames");
                     p.OpenScope();
                     {
                         foreach (var (key, value) in Names)
                         {
+                            p.PrintLine(GENERATED_CODE);
+
                             if (value.DisplayName is not null && value.IsDisplayNameTheFirstPresence)
                             {
                                 p.PrintLine($"public const string {key} = \"{value.DisplayName}\";");
@@ -577,9 +589,9 @@ namespace ZBase.Foundation.EnumExtensions
                             {
                                 p.PrintLine($"public const string {key} = Names.{key};");
                             }
-                        }
 
-                        p.PrintEndLine();
+                            p.PrintEndLine();
+                        }
 
                         p.PrintLine($"private static readonly string[] s_names = new string[]");
                         p.OpenScope();
@@ -593,11 +605,12 @@ namespace ZBase.Foundation.EnumExtensions
 
                         p.PrintEndLine();
 
-                        p.PrintLine(AGGRESSIVE_INLINING);
+                        p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                         p.PrintLine("public static global::System.ReadOnlyMemory<string> AsMemory() => s_names;");
 
                         p.PrintEndLine();
 
+                        p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                         p.PrintLine($"public static string Get({FullyQualifiedName} value)");
                         p = p.IncreasedIndent();
                         p.PrintLine("=> value switch");
@@ -620,12 +633,13 @@ namespace ZBase.Foundation.EnumExtensions
                     {
                         p.PrintEndLine();
 
-                        p.PrintLine(GENERATED_CODE);
+                        p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                         p.PrintLine("public static class FixedNames");
                         p.OpenScope();
                         {
                             foreach (var (key, _) in Names)
                             {
+                                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                                 p.PrintLine($"public static {FixedStringTypeName} {key}");
                                 p.OpenScope();
                                 {
@@ -639,10 +653,10 @@ namespace ZBase.Foundation.EnumExtensions
                                     p.CloseScope();
                                 }
                                 p.CloseScope();
+                                p.PrintEndLine();
                             }
 
-                            p.PrintEndLine();
-
+                            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                             p.PrintLine($"public static global::Unity.Collections.NativeArray<{FixedStringTypeName}> AsNativeArray(global::Unity.Collections.Allocator allocator)");
                             p.OpenScope();
                             {
@@ -667,6 +681,7 @@ namespace ZBase.Foundation.EnumExtensions
 
                             p.PrintEndLine();
 
+                            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                             p.PrintLine($"public static {FixedStringTypeName} Get({FullyQualifiedName} value)");
                             p = p.IncreasedIndent();
                             p.PrintLine($"=> value switch");
@@ -686,12 +701,14 @@ namespace ZBase.Foundation.EnumExtensions
 
                         p.PrintEndLine();
 
-                        p.PrintLine(GENERATED_CODE);
+                        p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                         p.PrintLine("public static class FixedDisplayNames");
                         p.OpenScope();
                         {
                             foreach (var (key, value) in Names)
                             {
+                                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+
                                 if (value.DisplayName is not null && value.IsDisplayNameTheFirstPresence)
                                 {
                                     p.PrintLine($"public static {FixedStringTypeName} {key}");
@@ -724,10 +741,11 @@ namespace ZBase.Foundation.EnumExtensions
                                     }
                                     p.CloseScope();
                                 }
+
+                                p.PrintEndLine();
                             }
 
-                            p.PrintEndLine();
-
+                            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                             p.PrintLine($"public static global::Unity.Collections.NativeArray<{FixedStringTypeName}> AsNativeArray(global::Unity.Collections.Allocator allocator)");
                             p.OpenScope();
                             {
@@ -752,6 +770,7 @@ namespace ZBase.Foundation.EnumExtensions
 
                             p.PrintEndLine();
 
+                            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                             p.PrintLine($"public static {FixedStringTypeName} Get({FullyQualifiedName} value)");
                             p = p.IncreasedIndent();
                             p.PrintLine($"=> value switch");
@@ -769,12 +788,6 @@ namespace ZBase.Foundation.EnumExtensions
                         }
                         p.CloseScope();
                     }
-
-                    p.PrintLine("");
-                    p.PrintLine("");
-                    p.PrintLine("");
-                    p.PrintLine("");
-                    p.PrintLine("");
                 }
                 p.CloseScope();
             }
