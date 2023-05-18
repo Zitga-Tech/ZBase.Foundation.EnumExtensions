@@ -9,6 +9,8 @@
     <ProjectReference Include="../Common/ZBase.Foundation.SourceGen.Common.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
       
     <ProjectReference Include="../EnumExtensionsGenerator/EnumExtensionsGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+      
+    <ProjectReference Include="../ZBase.Foundation.EnumExtensions.SourceGen/ZBase.Foundation.EnumExtensions.SourceGen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>
