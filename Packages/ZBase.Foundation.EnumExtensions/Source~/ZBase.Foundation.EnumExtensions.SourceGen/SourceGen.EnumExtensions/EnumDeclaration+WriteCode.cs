@@ -10,7 +10,8 @@ namespace ZBase.Foundation.EnumExtensions
 
         public string WriteCode()
         {
-            var typeName = $"{Syntax.Identifier.Text}Extensions";
+            var enumName = Syntax.Identifier.Text;
+            var typeName = $"{enumName}Extensions";
             var scopePrinter = new SyntaxNodeScopePrinter(Printer.DefaultLarge, Syntax.Parent);
             var p = scopePrinter.printer;
 
@@ -161,9 +162,9 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// <param name=\"name\">The name to check if it's defined</param>");
                     p.PrintLine("/// <returns><c>true</c> if a member with the name exists in the enumeration, <c>false</c> otherwise</returns>");
                     p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine("public static bool IsDefined(string name)");
+                    p.PrintLine($"public static bool IsDefined{enumName}(this string name)");
                     p = p.IncreasedIndent();
-                    p.PrintLine("=> IsDefined(name, allowMatchingMetadataAttribute: false);");
+                    p.PrintLine($"=> IsDefined{enumName}(name, allowMatchingMetadataAttribute: false);");
                     p = p.DecreasedIndent();
 
                     p.PrintEndLine();
@@ -178,7 +179,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// <returns><c>true</c> if a member with the name exists in the enumeration, or a member is decorated");
                     p.PrintLine("/// with a <c>[Display]</c> attribute with the name, <c>false</c> otherwise</returns>");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine("public static bool IsDefined(string name, bool allowMatchingMetadataAttribute)");
+                    p.PrintLine($"public static bool IsDefined{enumName}(this string name, bool allowMatchingMetadataAttribute)");
                     p.OpenScope();
                     {
                         if (IsDisplayAttributeUsed)
@@ -250,7 +251,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine($"/// of <see cref=\"{FullyQualifiedName}\" />. This parameter is passed uninitialized.</param>");
                     p.PrintLine("/// <returns><c>true</c> if the value parameter was converted successfully; otherwise, <c>false</c>.</returns>");
                     p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static bool TryParse(string name, out {FullyQualifiedName} value)");
+                    p.PrintLine($"public static bool TryParse(this string name, out {FullyQualifiedName} value)");
                     p = p.IncreasedIndent();
                     p.PrintLine("=> TryParse(name, out value, false, false);");
                     p = p.DecreasedIndent();
@@ -271,7 +272,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// <param name=\"ignoreCase\"><c>true</c> to read value in case insensitive mode; <c>false</c> to read value in case sensitive mode.</param>");
                     p.PrintLine("/// <returns><c>true</c> if the value parameter was converted successfully; otherwise, <c>false</c>.</returns>");
                     p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static bool TryParse(string name, out {FullyQualifiedName} value, bool ignoreCase)");
+                    p.PrintLine($"public static bool TryParse(this string name, out {FullyQualifiedName} value, bool ignoreCase)");
                     p = p.IncreasedIndent();
                     p.PrintLine("=> TryParse(name, out value, ignoreCase, false);");
                     p = p.DecreasedIndent();
@@ -294,7 +295,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// <c>[Display]</c> attribute when parsing, otherwise only considers the member names.</param>");
                     p.PrintLine("/// <returns><c>true</c> if the value parameter was converted successfully; otherwise, <c>false</c>.</returns>");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static bool TryParse(string name, out {FullyQualifiedName} value, bool ignoreCase, bool allowMatchingMetadataAttribute)");
+                    p.PrintLine($"public static bool TryParse(this string name, out {FullyQualifiedName} value, bool ignoreCase, bool allowMatchingMetadataAttribute)");
                     p.OpenScope();
                     {
                         p.PrintLine("if (string.IsNullOrWhiteSpace(name))");
