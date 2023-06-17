@@ -64,7 +64,7 @@ namespace ZBase.Foundation.SourceGen
                 foreach (var symbolName in options.PreprocessorSymbolNames)
                 {
                     inUnity2021OrNewer |= symbolName == "UNITY_2021_1_OR_NEWER";
-                    parseOptionsConfig.outputSourceGenFiles |= symbolName == "ENUM_EXTENSIONS_OUTPUT_SOURCEGEN_FILES";
+                    parseOptionsConfig.outputSourceGenFiles |= symbolName == "DATA_OUTPUT_SOURCEGEN_FILES";
                 }
 
                 parseOptionsConfig.pathIsInFirstAdditionalTextItem = inUnity2021OrNewer;
@@ -92,7 +92,6 @@ namespace ZBase.Foundation.SourceGen
 
                     var path = projectPathIsInFirstAdditionalTextItem ? texts[0].GetText(token)?.ToString() : texts[0].Path;
                     config.projectPath = path?.Replace('\\', '/');
-
                     return config;
                 });
 
@@ -106,7 +105,7 @@ namespace ZBase.Foundation.SourceGen
             {
                 return;
             }
-
+            
             var inUnity2021OrNewer = context.ParseOptions.PreprocessorSymbolNames.Contains("UNITY_2021_1_OR_NEWER");
 
             if (!context.AdditionalFiles.Any() || string.IsNullOrEmpty(context.AdditionalFiles[0].Path))

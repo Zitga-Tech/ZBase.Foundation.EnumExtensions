@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 // Everything in this file was copied from Unity's source generators.
 namespace ZBase.Foundation.SourceGen
@@ -124,14 +128,14 @@ namespace ZBase.Foundation.SourceGen
             => symbol.ToDisplayString(QualifiedFormatWithoutGlobalPrefix);
 
         public static string ToValidIdentifier(this ITypeSymbol symbol)
-            => symbol.ToDisplayString(QualifiedFormatWithoutGlobalPrefix).Replace('.', '_');
+            => symbol.ToDisplayString(QualifiedFormatWithoutGlobalPrefix).ToValidIdentifier();
 
         public static bool ImplementsInterface(this ISymbol symbol, string interfaceName)
         {
             interfaceName = PrependGlobalIfMissing(interfaceName);
 
-            return symbol is ITypeSymbol typeSymbol &&
-                   typeSymbol.AllInterfaces.Any(i => i.ToFullName() == interfaceName || i.InheritsFromInterface(interfaceName));
+            return symbol is ITypeSymbol typeSymbol
+                && typeSymbol.AllInterfaces.Any(i => i.ToFullName() == interfaceName || i.InheritsFromInterface(interfaceName));
         }
 
         public static bool Is(this ITypeSymbol symbol, string nameSpace, string typeName, bool checkBaseType = true)
@@ -219,6 +223,23 @@ namespace ZBase.Foundation.SourceGen
                 .Any(attribute => attribute.AttributeClass.ToFullName() == fullyQualifiedAttributeName);
         }
 
+        public static AttributeData GetAttribute(this ISymbol typeSymbol, string fullyQualifiedAttributeName)
+        {
+            fullyQualifiedAttributeName = PrependGlobalIfMissing(fullyQualifiedAttributeName);
+
+            return typeSymbol.GetAttributes()
+                .Where(attribute => attribute.AttributeClass.ToFullName() == fullyQualifiedAttributeName)
+                .FirstOrDefault();
+        }
+
+        public static IEnumerable<AttributeData> GetAttributes(this ISymbol typeSymbol, string fullyQualifiedAttributeName)
+        {
+            fullyQualifiedAttributeName = PrependGlobalIfMissing(fullyQualifiedAttributeName);
+
+            return typeSymbol.GetAttributes()
+                .Where(attribute => attribute.AttributeClass.ToFullName() == fullyQualifiedAttributeName);
+        }
+
         public static bool HasAttributeOrFieldWithAttribute(this ITypeSymbol typeSymbol, string fullyQualifiedAttributeName)
         {
             fullyQualifiedAttributeName = PrependGlobalIfMissing(fullyQualifiedAttributeName);
@@ -287,6 +308,51 @@ namespace ZBase.Foundation.SourceGen
             => typeOrNamespaceName.StartsWith("global::") == false
             ? $"global::{typeOrNamespaceName}"
             : typeOrNamespaceName;
+
+        /// <summary>
+        /// Checks whether or not a given symbol has an attribute with the specified fully qualified metadata name.
+        /// </summary>
+        /// <param name="symbol">The input <see cref="ISymbol"/> instance to check.</param>
+        /// <param name="typeSymbol">The <see cref="ITypeSymbol"/> instance for the attribute type to look for.</param>
+        /// <returns>Whether or not <paramref name="symbol"/> has an attribute with the specified type.</returns>
+        public static bool HasAttributeWithType(this ISymbol symbol, ITypeSymbol typeSymbol)
+        {
+            foreach (AttributeData attribute in symbol.GetAttributes())
+            {
+                if (SymbolEqualityComparer.Default.Equals(attribute.AttributeClass, typeSymbol))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool TryGetGenericType(
+              this INamedTypeSymbol symbol
+            , string startWith
+            , int genericArgumentCount
+            , out INamedTypeSymbol result
+        )
+        {
+            var baseType = symbol;
+
+            while (baseType != null)
+            {
+                if (baseType.ToFullName().StartsWith(startWith)
+                    && baseType.TypeArguments.Length == genericArgumentCount
+                )
+                {
+                    result = baseType;
+                    return true;
+                }
+
+                baseType = baseType.BaseType;
+            }
+
+            result = null;
+            return false;
+        }
     }
 }
 

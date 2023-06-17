@@ -1,18 +1,14 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading;
 using ZBase.Foundation.SourceGen;
 
 namespace ZBase.Foundation.EnumExtensions
 {
     public partial class EnumDeclaration
     {
-        public const string FULL_EXTENSIONS_ATTRIBUTE_NAME = "global::ZBase.Foundation.EnumExtensions.EnumExtensionsAttribute";
-        public const string FULL_FLAGS_ATTRIBUTE_NAME = "global::System.FlagsAttribute";
         private const string DISPLAY_ATTRIBUTE = "System.ComponentModel.DataAnnotations.DisplayAttribute";
         private const string DESCRIPTION_ATTRIBUTE = "System.ComponentModel.DescriptionAttribute";
         private const string ENUM_DISPLAY_ATTRIBUTE = "ZBase.Foundation.EnumExtensions.DisplayAttribute";
@@ -22,8 +18,6 @@ namespace ZBase.Foundation.EnumExtensions
         public string FullyQualifiedName { get; private set; }
 
         public string UnderlyingTypeName { get; private set; }
-
-        public bool IsValid { get; private set; }
 
         public EquatableArray<(string Key, EnumValueOption Value)> Names { get; private set; }
 
@@ -37,42 +31,19 @@ namespace ZBase.Foundation.EnumExtensions
 
         public bool IsDisplayAttributeUsed { get; private set; }
 
-        public EnumDeclaration(EnumDeclarationSyntax candidate, SemanticModel semanticModel, CancellationToken token)
+        public EnumDeclaration(
+              EnumDeclarationSyntax syntax
+            , INamedTypeSymbol symbol
+            , bool hasFlags
+        )
         {
-            var enumTypeSymbol = semanticModel.GetDeclaredSymbol(candidate, token);
+            Syntax = syntax;
+            FullyQualifiedName = symbol.ToFullName();
+            UnderlyingTypeName = symbol.EnumUnderlyingType.ToString();
+            IsPublic = symbol.DeclaredAccessibility == Accessibility.Public;
+            HasFlags = hasFlags;
 
-            Syntax = candidate;
-            FullyQualifiedName = enumTypeSymbol.ToFullName();
-            UnderlyingTypeName = enumTypeSymbol.EnumUnderlyingType.ToString();
-            IsPublic = enumTypeSymbol.DeclaredAccessibility == Accessibility.Public;
-
-            foreach (var attribList in candidate.AttributeLists)
-            {
-                foreach (var attrib in attribList.Attributes)
-                {
-                    var typeInfo = semanticModel.GetTypeInfo(attrib, token);
-                    var fullName = typeInfo.Type.ToFullName();
-
-                    if (fullName.StartsWith(FULL_EXTENSIONS_ATTRIBUTE_NAME))
-                    {
-                        IsValid = true;
-                        break;
-                    }
-
-                    if (fullName.StartsWith(FULL_FLAGS_ATTRIBUTE_NAME))
-                    {
-                        HasFlags = true;
-                        break;
-                    }
-                }
-            }
-
-            if (IsValid == false)
-            {
-                return;
-            }
-
-            foreach (var assembly in enumTypeSymbol.ContainingModule.ReferencedAssemblySymbols)
+            foreach (var assembly in symbol.ContainingModule.ReferencedAssemblySymbols)
             {
                 if (assembly.ToDisplayString().StartsWith("Unity.Collections,"))
                 {
@@ -81,7 +52,7 @@ namespace ZBase.Foundation.EnumExtensions
                 }
             }
 
-            var enumMembers = enumTypeSymbol.GetMembers();
+            var enumMembers = symbol.GetMembers();
             var members = new List<(string, EnumValueOption)>(enumMembers.Length);
             var displayNames = new HashSet<string>();
             var isDisplayNameTheFirstPresence = false;

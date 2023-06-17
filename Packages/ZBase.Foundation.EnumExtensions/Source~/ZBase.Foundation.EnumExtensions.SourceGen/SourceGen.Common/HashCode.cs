@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace ZBase.Foundation.EnumExtensions
+namespace ZBase.Foundation.SourceGen
 {
     /// <summary>
     /// Polyfill for .NET 6 HashCode  

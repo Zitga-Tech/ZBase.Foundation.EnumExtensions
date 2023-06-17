@@ -63,6 +63,40 @@ namespace ZBase.Foundation.SourceGen
             return fileName;
         }
 
+        public static string GetGeneratedSourceFileName(this SyntaxTree syntaxTree, string generatorName, SyntaxNode node, string typeName)
+            => GetGeneratedSourceFileName(syntaxTree, generatorName, node.GetLocation().GetLineSpan().StartLinePosition.Line, typeName);
+
+        public static string GetGeneratedSourceFileName(this SyntaxTree syntaxTree, string generatorName, int salting, string typeName)
+        {
+            var (isSuccess, fileName) = TryGetFileNameWithoutExtension(syntaxTree);
+            var stableHashCode = SourceGenHelpers.GetStableHashCode(syntaxTree.FilePath) & 0x7fffffff;
+
+            var postfix = generatorName.Length > 0 ? $"__{generatorName}" : string.Empty;
+            
+            if (string.IsNullOrWhiteSpace(typeName) == false)
+            {
+                postfix = $"__{typeName}{postfix}";
+            }
+
+            if (isSuccess)
+                fileName = $"{fileName}{postfix}_{stableHashCode}{salting}.g.cs";
+            else
+                fileName = Path.Combine($"{Path.GetRandomFileName()}{postfix}", ".g.cs");
+
+            return fileName;
+        }
+
+        public static string GetGeneratedSourceFileName(this SyntaxTree syntaxTree, string generatorName, string fileName, SyntaxNode node)
+            => GetGeneratedSourceFileName(syntaxTree, generatorName, fileName, node.GetLocation().GetLineSpan().StartLinePosition.Line);
+
+        public static string GetGeneratedSourceFileName(this SyntaxTree syntaxTree, string generatorName, string fileName, int salting = 0)
+        {
+            var stableHashCode = SourceGenHelpers.GetStableHashCode(syntaxTree.FilePath) & 0x7fffffff;
+            var postfix = generatorName.Length > 0 ? $"__{generatorName}" : string.Empty;
+
+            return $"{fileName}{postfix}_{stableHashCode}{salting}.g.cs";
+        }
+
         public static string GetGeneratedSourceFilePath(this SyntaxTree syntaxTree, string assemblyName, string generatorName)
         {
             var fileName = GetGeneratedSourceFileName(syntaxTree, generatorName);
@@ -75,7 +109,7 @@ namespace ZBase.Foundation.SourceGen
             return $"Temp/GeneratedCode/{assemblyName}";
         }
 
-        private static (bool IsSuccess, string FileName) TryGetFileNameWithoutExtension(SyntaxTree syntaxTree)
+        public static (bool IsSuccess, string FileName) TryGetFileNameWithoutExtension(this SyntaxTree syntaxTree)
         {
             var fileName = Path.GetFileNameWithoutExtension(syntaxTree.FilePath);
             return (IsSuccess: true, fileName);
@@ -166,7 +200,7 @@ namespace ZBase.Foundation.SourceGen
 
         public static SyntaxNode NodeAfter(this SyntaxNode node, Func<SyntaxNodeOrToken, bool> predicate)
         {
-            bool nodeFound = false;
+            var nodeFound = false;
             var descendents = node.DescendantNodesAndTokens().ToArray();
 
             for (var i = 0; i < descendents.Count(); ++i)
@@ -437,15 +471,41 @@ namespace ZBase.Foundation.SourceGen
         /// <returns></returns>
         public static bool HasAttributeCandidate(this SyntaxNode syntaxNode, string attributeNameSpace, string attributeName)
         {
-            if (syntaxNode.TryGetFirstChildByKind(SyntaxKind.AttributeList, out var fieldAttributeList)
-                && fieldAttributeList.TryGetFirstChildByKind(SyntaxKind.Attribute, out var fieldAttribute))
+            foreach (var attribListCandidate in syntaxNode.ChildNodes())
             {
-                var attribute = fieldAttribute as AttributeSyntax;
-                if (attribute.Name.IsTypeNameCandidate(attributeNameSpace, attributeName))
+                if (attribListCandidate == null || attribListCandidate.IsKind(SyntaxKind.AttributeList) == false)
+                {
+                    continue;
+                }
+
+                foreach (var attribCandidate in attribListCandidate.ChildNodes())
+                {
+                    if (attribCandidate is AttributeSyntax attrib
+                        && attrib.Name.IsTypeNameCandidate(attributeNameSpace, attributeName)
+                    )
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public static bool AnyAttributeCandidate(
+              this SeparatedSyntaxList<BaseTypeSyntax> nodes
+            , string attributeNameSpace
+            , string attributeName
+        )
+        {
+            foreach (var node in nodes)
+            {
+                if (node.HasAttributeCandidate(attributeNameSpace, attributeName))
                 {
                     return true;
                 }
             }
+
             return false;
         }
 

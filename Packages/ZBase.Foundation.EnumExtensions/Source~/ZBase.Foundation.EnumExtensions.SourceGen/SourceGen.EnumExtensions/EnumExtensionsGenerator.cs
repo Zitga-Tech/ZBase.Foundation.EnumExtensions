@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
-using System.Linq;
 using System.Threading;
 using ZBase.Foundation.SourceGen;
 
@@ -11,8 +10,8 @@ namespace ZBase.Foundation.EnumExtensions
     [Generator]
     public class EnumExtensionsGenerator : IIncrementalGenerator
     {
-        public const string ATTRIBUTE_NAME = "EnumExtensions";
-        public const string FULL_EXTENSIONS_ATTRIBUTE_NAME = "global::ZBase.Foundation.EnumExtensions.EnumExtensionsAttribute";
+        public const string ENUM_EXTENSIONS_ATTRIBUTE = "global::ZBase.Foundation.EnumExtensions.EnumExtensionsAttribute";
+        public const string FLAGS_ATTRIBUTE = "global::System.FlagsAttribute";
         public const string GENERATOR_NAME = nameof(EnumExtensionsGenerator);
 
         public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -20,9 +19,9 @@ namespace ZBase.Foundation.EnumExtensions
             var projectPathProvider = SourceGenHelpers.GetSourceGenConfigProvider(context);
 
             var candidateProvider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: IsSyntaxMatch,
-                transform: GetSemanticSyntaxMatch
-            ).Where(t => t is { });
+                predicate: IsValidEnumSyntax,
+                transform: GetSemanticSymbolMatch
+            ).Where(t => t.syntax is { } && t.symbol is { });
 
             var compilationProvider = context.CompilationProvider;
             var combined = candidateProvider.Combine(compilationProvider).Combine(projectPathProvider);
@@ -38,78 +37,46 @@ namespace ZBase.Foundation.EnumExtensions
             });
         }
 
-        public static bool IsSyntaxMatch(
-              SyntaxNode syntaxNode
-            , CancellationToken token
-        )
+        private static bool IsValidEnumSyntax(SyntaxNode node, CancellationToken _)
         {
-            token.ThrowIfCancellationRequested();
-
-            if (syntaxNode is not EnumDeclarationSyntax enumSyntax)
-            {
-                return false;
-            }
-
-            if (enumSyntax.AttributeLists == null || enumSyntax.AttributeLists.Count < 1)
-            {
-                return false;
-            }
-
-            foreach (var attribList in enumSyntax.AttributeLists)
-            {
-                foreach (var attrib in attribList.Attributes)
-                {
-                    if (attrib.Name is IdentifierNameSyntax identifierNameSyntax
-                        && identifierNameSyntax.Identifier.ValueText == ATTRIBUTE_NAME
-                    )
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
+            return node is EnumDeclarationSyntax syntax
+                && syntax.AttributeLists.Count > 0
+                && syntax.HasAttributeCandidate("ZBase.Foundation.EnumExtensions", "EnumExtensions")
+                ;
         }
 
-        public static EnumDeclarationSyntax GetSemanticSyntaxMatch(
-              GeneratorSyntaxContext syntaxContext
+        public static (EnumDeclarationSyntax syntax, INamedTypeSymbol symbol, bool hasFlags) GetSemanticSymbolMatch(
+              GeneratorSyntaxContext context
             , CancellationToken token
         )
         {
             token.ThrowIfCancellationRequested();
 
-            if (syntaxContext.Node is not EnumDeclarationSyntax enumSyntax)
+            if (context.Node is not EnumDeclarationSyntax syntax)
             {
-                return null;
+                return (null, null, false);
             }
 
-            var semanticModel = syntaxContext.SemanticModel;
+            var semanticModel = context.SemanticModel;
+            var symbol = semanticModel.GetDeclaredSymbol(syntax, token);
 
-            foreach (var attribList in enumSyntax.AttributeLists)
+            if (symbol == null || symbol.HasAttribute(ENUM_EXTENSIONS_ATTRIBUTE) == false)
             {
-                foreach (var attrib in attribList.Attributes)
-                {
-                    var typeInfo = semanticModel.GetTypeInfo(attrib, token);
-                    var fullName = typeInfo.Type.ToFullName();
-
-                    if (fullName.StartsWith(FULL_EXTENSIONS_ATTRIBUTE_NAME))
-                    {
-                        return enumSyntax;
-                    }
-                }
+                return (null, null, false);
             }
 
-            return null;
+            return (syntax, symbol, symbol.HasAttribute(FLAGS_ATTRIBUTE));
         }
 
         private static void GenerateOutput(
               SourceProductionContext context
             , Compilation compilation
-            , EnumDeclarationSyntax candidate
+            , (EnumDeclarationSyntax syntax, INamedTypeSymbol symbol, bool hasFlag) candidate
             , string projectPath
             , bool outputSourceGenFiles
         )
         {
-            if (candidate == null)
+            if (candidate.syntax == null || candidate.symbol == null)
             {
                 return;
             }
@@ -120,26 +87,20 @@ namespace ZBase.Foundation.EnumExtensions
             {
                 SourceGenHelpers.ProjectPath = projectPath;
 
-                var syntaxTree = candidate.SyntaxTree;
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var declaration = new EnumDeclaration(candidate, semanticModel, context.CancellationToken);
-
-                if (declaration.IsValid == false)
-                {
-                    return;
-                }
+                var syntaxTree = candidate.syntax.SyntaxTree;
+                var declaration = new EnumDeclaration(candidate.syntax, candidate.symbol, candidate.hasFlag);
 
                 var source = declaration.WriteCode();
                 var sourceFilePath = syntaxTree.GetGeneratedSourceFilePath(compilation.Assembly.Name, GENERATOR_NAME);
                 var outputSource = TypeCreationHelpers.GenerateSourceTextForRootNodes(
                       sourceFilePath
-                    , candidate
+                    , candidate.syntax
                     , source
                     , context.CancellationToken
                 );
 
                 context.AddSource(
-                      syntaxTree.GetGeneratedSourceFileName(GENERATOR_NAME, candidate)
+                      syntaxTree.GetGeneratedSourceFileName(GENERATOR_NAME, candidate.syntax)
                     , outputSource
                 );
 
@@ -147,7 +108,7 @@ namespace ZBase.Foundation.EnumExtensions
                 {
                     SourceGenHelpers.OutputSourceToFile(
                           context
-                        , candidate.GetLocation()
+                        , candidate.syntax.GetLocation()
                         , sourceFilePath
                         , outputSource
                     );
@@ -162,7 +123,7 @@ namespace ZBase.Foundation.EnumExtensions
 
                 context.ReportDiagnostic(Diagnostic.Create(
                       s_errorDescriptor
-                    , candidate.GetLocation()
+                    , candidate.syntax.GetLocation()
                     , e.ToUnityPrintableString()
                 ));
             }
