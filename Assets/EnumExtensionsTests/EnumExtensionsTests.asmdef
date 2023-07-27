@@ -1,0 +1,17 @@
+{
+    "name": "EnumExtensionsTests",
+    "rootNamespace": "EnumExtensionsTests",
+    "references": [
+        "Unity.Collections",
+        "ZBase.Foundation.EnumExtensions"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

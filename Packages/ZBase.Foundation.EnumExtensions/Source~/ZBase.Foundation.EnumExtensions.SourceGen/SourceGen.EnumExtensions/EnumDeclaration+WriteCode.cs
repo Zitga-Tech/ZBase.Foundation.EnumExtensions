@@ -1,4 +1,5 @@
-﻿using ZBase.Foundation.SourceGen;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using ZBase.Foundation.SourceGen;
 
 namespace ZBase.Foundation.EnumExtensions
 {
@@ -12,18 +13,11 @@ namespace ZBase.Foundation.EnumExtensions
         {
             var enumName = Syntax.Identifier.Text;
             var typeName = $"{enumName}Extensions";
-            var scopePrinter = new SyntaxNodeScopePrinter(Printer.DefaultLarge, Syntax.Parent);
-            var p = scopePrinter.printer;
+            var p = Printer.DefaultLarge;
+            var @this = Syntax.Parent is NamespaceDeclarationSyntax ? "this " : "";
 
             p = p.IncreasedIndent();
             {
-                p.PrintLine("using System;");
-
-                if (ReferenceUnityCollections)
-                {
-                    p.PrintLine("using Unity.Collections;");
-                }
-
                 p.PrintEndLine();
 
                 p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
@@ -58,7 +52,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// <param name=\"value\">The value to retrieve the string value for</param>");
                     p.PrintLine("/// <returns>The string representation of the value</returns>");
                     p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static string ToStringFast(this {FullyQualifiedName} value)");
+                    p.PrintLine($"public static string ToStringFast({@this}{FullyQualifiedName} value)");
                     p = p.IncreasedIndent();
                     p.PrintLine("=> DisplayNames.Get(value);");
                     p = p.DecreasedIndent();
@@ -76,7 +70,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintLine("/// <param name=\"value\">The value to retrieve the string value for</param>");
                         p.PrintLine("/// <returns>The fixed string representation of the value</returns>");
                         p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                        p.PrintLine($"public static {FixedStringTypeName} ToFixedStringFast(this {FullyQualifiedName} value)");
+                        p.PrintLine($"public static {FixedStringTypeName} ToFixedStringFast({@this}{FullyQualifiedName} value)");
                         p = p.IncreasedIndent();
                         p.PrintLine("=> FixedDisplayNames.Get(value);");
                         p = p.DecreasedIndent();
@@ -88,7 +82,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("public static bool TryFormat(");
                     p = p.IncreasedIndent();
                     {
-                        p.PrintLine($"  this {FullyQualifiedName} value");
+                        p.PrintLine($"  {@this}{FullyQualifiedName} value");
                         p.PrintLine(", global::System.Span<char> destination");
                         p.PrintLine(", out int charsWritten");
                         p.PrintLine(", global::System.ReadOnlySpan<char> format = default");
@@ -101,7 +95,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintLine("if (IsDefined(value))");
                         p.OpenScope();
                         {
-                            p.PrintLine("var span = value.ToStringFast().AsSpan();");
+                            p.PrintLine("var span = global::System.MemoryExtensions.AsSpan(ToStringFast(value));");
 
                             p.PrintLine("if (span.Length == 0 || span.TryCopyTo(destination) == false)");
                             p.OpenScope();
@@ -116,7 +110,7 @@ namespace ZBase.Foundation.EnumExtensions
                         }
                         p.CloseScope();
 
-                        p.PrintLine("if (value.ToUnderlyingValue().TryFormat(destination, out var chars, format, provider))");
+                        p.PrintLine("if (ToUnderlyingValue(value).TryFormat(destination, out var chars, format, provider))");
                         p.OpenScope();
                         {
                             p.PrintLine("charsWritten = chars;");
@@ -137,7 +131,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// <param name=\"value\">The value to check if it's defined</param>");
                     p.PrintLine("/// <returns><c>true</c> if the value exists in the enumeration, <c>false</c> otherwise</returns>");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static bool IsDefined(this {FullyQualifiedName} value)");
+                    p.PrintLine($"public static bool IsDefined({@this}{FullyQualifiedName} value)");
                     p = p.IncreasedIndent();
                     {
                         p.PrintLine("=> value switch");
@@ -162,7 +156,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// <param name=\"name\">The name to check if it's defined</param>");
                     p.PrintLine("/// <returns><c>true</c> if a member with the name exists in the enumeration, <c>false</c> otherwise</returns>");
                     p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static bool IsDefined{enumName}(this string name)");
+                    p.PrintLine($"public static bool IsDefined{enumName}({@this}string name)");
                     p = p.IncreasedIndent();
                     p.PrintLine($"=> IsDefined{enumName}(name, allowMatchingMetadataAttribute: false);");
                     p = p.DecreasedIndent();
@@ -179,7 +173,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// <returns><c>true</c> if a member with the name exists in the enumeration, or a member is decorated");
                     p.PrintLine("/// with a <c>[Display]</c> attribute with the name, <c>false</c> otherwise</returns>");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static bool IsDefined{enumName}(this string name, bool allowMatchingMetadataAttribute)");
+                    p.PrintLine($"public static bool IsDefined{enumName}({@this}string name, bool allowMatchingMetadataAttribute)");
                     p.OpenScope();
                     {
                         if (IsDisplayAttributeUsed)
@@ -231,7 +225,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintEndLine();
 
                     p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static {UnderlyingTypeName} ToUnderlyingValue(this {FullyQualifiedName} value)");
+                    p.PrintLine($"public static {UnderlyingTypeName} ToUnderlyingValue({@this}{FullyQualifiedName} value)");
                     p = p.IncreasedIndent();
                     p.PrintLine($"=> ({UnderlyingTypeName})value;");
                     p = p.DecreasedIndent();
@@ -251,7 +245,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine($"/// of <see cref=\"{FullyQualifiedName}\" />. This parameter is passed uninitialized.</param>");
                     p.PrintLine("/// <returns><c>true</c> if the value parameter was converted successfully; otherwise, <c>false</c>.</returns>");
                     p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static bool TryParse(this string name, out {FullyQualifiedName} value)");
+                    p.PrintLine($"public static bool TryParse({@this}string name, out {FullyQualifiedName} value)");
                     p = p.IncreasedIndent();
                     p.PrintLine("=> TryParse(name, out value, false, false);");
                     p = p.DecreasedIndent();
@@ -272,7 +266,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// <param name=\"ignoreCase\"><c>true</c> to read value in case insensitive mode; <c>false</c> to read value in case sensitive mode.</param>");
                     p.PrintLine("/// <returns><c>true</c> if the value parameter was converted successfully; otherwise, <c>false</c>.</returns>");
                     p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static bool TryParse(this string name, out {FullyQualifiedName} value, bool ignoreCase)");
+                    p.PrintLine($"public static bool TryParse({@this}string name, out {FullyQualifiedName} value, bool ignoreCase)");
                     p = p.IncreasedIndent();
                     p.PrintLine("=> TryParse(name, out value, ignoreCase, false);");
                     p = p.DecreasedIndent();
@@ -295,7 +289,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// <c>[Display]</c> attribute when parsing, otherwise only considers the member names.</param>");
                     p.PrintLine("/// <returns><c>true</c> if the value parameter was converted successfully; otherwise, <c>false</c>.</returns>");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static bool TryParse(this string name, out {FullyQualifiedName} value, bool ignoreCase, bool allowMatchingMetadataAttribute)");
+                    p.PrintLine($"public static bool TryParse({@this}string name, out {FullyQualifiedName} value, bool ignoreCase, bool allowMatchingMetadataAttribute)");
                     p.OpenScope();
                     {
                         p.PrintLine("if (string.IsNullOrWhiteSpace(name))");
@@ -449,7 +443,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.OpenScope();
                         {
                             p.PrintLine($"var fs = new {FixedStringTypeName}();");
-                            p.PrintLine("fs.Append(value);");
+                            p.PrintLine("global::Unity.Collections.FixedStringMethods.Append(ref fs, value);");
                             p.PrintLine("return fs;");
                         }
                         p.CloseScope();
@@ -483,7 +477,7 @@ namespace ZBase.Foundation.EnumExtensions
                             p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                             p.PrintLine($"public static global::Unity.Collections.NativeArray<{FullyQualifiedName}>.ReadOnly AsNativeArray(global::Unity.Collections.Allocator allocator)");
                             p = p.IncreasedIndent();
-                            p.PrintLine($"=> new global::Unity.Collections.NativeArray<{FullyQualifiedName}> (s_values, allocator).AsReadOnly();");
+                            p.PrintLine($"=> new global::Unity.Collections.NativeArray<{FullyQualifiedName}>(s_values, allocator).AsReadOnly();");
                             p = p.DecreasedIndent();
                         }
                     }
@@ -517,7 +511,7 @@ namespace ZBase.Foundation.EnumExtensions
                             p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                             p.PrintLine($"public static global::Unity.Collections.NativeArray<{UnderlyingTypeName}>.ReadOnly AsNativeArray(global::Unity.Collections.Allocator allocator)");
                             p = p.IncreasedIndent();
-                            p.PrintLine($"=> new global::Unity.Collections.NativeArray<{UnderlyingTypeName}> (s_values, allocator).AsReadOnly();");
+                            p.PrintLine($"=> new global::Unity.Collections.NativeArray<{UnderlyingTypeName}>(s_values, allocator).AsReadOnly();");
                             p = p.DecreasedIndent();
                         }
                     }
@@ -648,7 +642,7 @@ namespace ZBase.Foundation.EnumExtensions
                                     p.OpenScope();
                                     {
                                         p.PrintLine($"var fs = new {FixedStringTypeName}();");
-                                        p.PrintLine($"fs.Append(({FixedStringTypeName})nameof({FullyQualifiedName}.{key}));");
+                                        p.PrintLine($"global::Unity.Collections.FixedStringMethods.Append(ref fs, ({FixedStringTypeName})nameof({FullyQualifiedName}.{key}));");
                                         p.PrintLine("return fs;");
                                     }
                                     p.CloseScope();
@@ -661,7 +655,7 @@ namespace ZBase.Foundation.EnumExtensions
                             p.PrintLine($"public static global::Unity.Collections.NativeArray<{FixedStringTypeName}> AsNativeArray(global::Unity.Collections.Allocator allocator)");
                             p.OpenScope();
                             {
-                                p.PrintLine($"var names = new global::Unity.Collections.NativeArray<{FixedStringTypeName}> ({typeName}.Length, allocator, NativeArrayOptions.UninitializedMemory);");
+                                p.PrintLine($"var names = new global::Unity.Collections.NativeArray<{FixedStringTypeName}>({typeName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
 
                                 var index = 0;
 
@@ -719,7 +713,7 @@ namespace ZBase.Foundation.EnumExtensions
                                         p.OpenScope();
                                         {
                                             p.PrintLine($"var fs = new {FixedStringTypeName}();");
-                                            p.PrintLine($"fs.Append(({FixedStringTypeName})\"{value.DisplayName}\");");
+                                            p.PrintLine($"global::Unity.Collections.FixedStringMethods.Append(ref fs, ({FixedStringTypeName})\"{value.DisplayName}\");");
                                             p.PrintLine("return fs;");
                                         }
                                         p.CloseScope();
@@ -735,7 +729,7 @@ namespace ZBase.Foundation.EnumExtensions
                                         p.OpenScope();
                                         {
                                             p.PrintLine($"var fs = new {FixedStringTypeName}();");
-                                            p.PrintLine($"fs.Append(({FixedStringTypeName})nameof({FullyQualifiedName}.{key}));");
+                                            p.PrintLine($"global::Unity.Collections.FixedStringMethods.Append(ref fs, ({FixedStringTypeName})nameof({FullyQualifiedName}.{key}));");
                                             p.PrintLine("return fs;");
                                         }
                                         p.CloseScope();
@@ -750,7 +744,7 @@ namespace ZBase.Foundation.EnumExtensions
                             p.PrintLine($"public static global::Unity.Collections.NativeArray<{FixedStringTypeName}> AsNativeArray(global::Unity.Collections.Allocator allocator)");
                             p.OpenScope();
                             {
-                                p.PrintLine($"var names = new global::Unity.Collections.NativeArray<{FixedStringTypeName}> ({typeName}.Length, allocator, NativeArrayOptions.UninitializedMemory);");
+                                p.PrintLine($"var names = new global::Unity.Collections.NativeArray<{FixedStringTypeName}>({typeName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
 
                                 var index = 0;
 

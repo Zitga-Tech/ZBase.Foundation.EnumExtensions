@@ -12,4 +12,11 @@ namespace EnumExtensionsTests
     {
 
     }
+
+    public class Program
+    {
+        public void Do()
+        {
+        }
+    }
 }
