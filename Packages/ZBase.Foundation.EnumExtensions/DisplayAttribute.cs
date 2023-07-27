@@ -5,8 +5,11 @@ namespace ZBase.Foundation.EnumExtensions
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
     public sealed partial class DisplayAttribute : Attribute
     {
-        public string Name { get; set; }
+        public string Value { get; }
 
-        public DisplayAttribute() { }
+        public DisplayAttribute(string value)
+        {
+            this.Value = value;
+        }
     }
 }

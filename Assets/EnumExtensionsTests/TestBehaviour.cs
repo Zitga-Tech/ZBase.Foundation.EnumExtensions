@@ -13,7 +13,10 @@ namespace EnumExtensionsTests
         [EnumExtensions]
         public enum ComponentType
         {
+            [Display("")]
             None,
+
+            [Display("Sprite Renderer")]
             SpriteRenderer,
         }
     }

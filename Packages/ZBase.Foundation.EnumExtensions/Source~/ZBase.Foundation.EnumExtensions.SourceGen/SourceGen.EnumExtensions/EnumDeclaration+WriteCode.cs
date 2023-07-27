@@ -45,6 +45,19 @@ namespace ZBase.Foundation.EnumExtensions
 
                     p.PrintLine("/// <summary>");
                     p.PrintLine($"/// Returns the string representation of the <see cref=\"{FullyQualifiedName}\"/> value.");
+                    p.PrintLine("/// </summary>");
+                    p.PrintLine("/// <param name=\"value\">The value to retrieve the string value for</param>");
+                    p.PrintLine("/// <returns>The string representation of the value</returns>");
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine($"public static string ToStringFast({@this}{FullyQualifiedName} value)");
+                    p = p.IncreasedIndent();
+                    p.PrintLine("=> Names.Get(value);");
+                    p = p.DecreasedIndent();
+
+                    p.PrintEndLine();
+
+                    p.PrintLine("/// <summary>");
+                    p.PrintLine($"/// Returns the string representation of the <see cref=\"{FullyQualifiedName}\"/> value.");
                     p.PrintLine("/// If the attribute is decorated with a <c>[Display]</c> attribute, then");
                     p.PrintLine("/// uses the provided value. Otherwise uses the name of the member, equivalent to");
                     p.PrintLine("/// calling <c>ToString()</c> on <paramref name=\"value\"/>.");
@@ -52,7 +65,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// <param name=\"value\">The value to retrieve the string value for</param>");
                     p.PrintLine("/// <returns>The string representation of the value</returns>");
                     p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static string ToStringFast({@this}{FullyQualifiedName} value)");
+                    p.PrintLine($"public static string ToDisplayStringFast({@this}{FullyQualifiedName} value)");
                     p = p.IncreasedIndent();
                     p.PrintLine("=> DisplayNames.Get(value);");
                     p = p.DecreasedIndent();
@@ -63,6 +76,19 @@ namespace ZBase.Foundation.EnumExtensions
                     {
                         p.PrintLine("/// <summary>");
                         p.PrintLine($"/// Returns the fixed string representation of the <see cref=\"{FullyQualifiedName}\"/> value.");
+                        p.PrintLine("/// </summary>");
+                        p.PrintLine("/// <param name=\"value\">The value to retrieve the string value for</param>");
+                        p.PrintLine("/// <returns>The fixed string representation of the value</returns>");
+                        p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                        p.PrintLine($"public static {FixedStringTypeName} ToFixedStringFast({@this}{FullyQualifiedName} value)");
+                        p = p.IncreasedIndent();
+                        p.PrintLine("=> FixedNames.Get(value);");
+                        p = p.DecreasedIndent();
+
+                        p.PrintEndLine();
+
+                        p.PrintLine("/// <summary>");
+                        p.PrintLine($"/// Returns the fixed string representation of the <see cref=\"{FullyQualifiedName}\"/> value.");
                         p.PrintLine("/// If the attribute is decorated with a <c>[Display]</c> attribute, then");
                         p.PrintLine("/// uses the provided value. Otherwise uses the name of the member, equivalent to");
                         p.PrintLine("/// calling <c>ToString()</c> on <paramref name=\"value\"/>.");
@@ -70,7 +96,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintLine("/// <param name=\"value\">The value to retrieve the string value for</param>");
                         p.PrintLine("/// <returns>The fixed string representation of the value</returns>");
                         p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                        p.PrintLine($"public static {FixedStringTypeName} ToFixedStringFast({@this}{FullyQualifiedName} value)");
+                        p.PrintLine($"public static {FixedStringTypeName} ToFixedDisplayStringFast({@this}{FullyQualifiedName} value)");
                         p = p.IncreasedIndent();
                         p.PrintLine("=> FixedDisplayNames.Get(value);");
                         p = p.DecreasedIndent();

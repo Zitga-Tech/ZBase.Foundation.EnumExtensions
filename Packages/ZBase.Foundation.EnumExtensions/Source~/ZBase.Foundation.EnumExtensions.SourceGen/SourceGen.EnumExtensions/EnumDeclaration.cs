@@ -9,9 +9,7 @@ namespace ZBase.Foundation.EnumExtensions
 {
     public partial class EnumDeclaration
     {
-        private const string DISPLAY_ATTRIBUTE = "System.ComponentModel.DataAnnotations.DisplayAttribute";
-        private const string DESCRIPTION_ATTRIBUTE = "System.ComponentModel.DescriptionAttribute";
-        private const string ENUM_DISPLAY_ATTRIBUTE = "ZBase.Foundation.EnumExtensions.DisplayAttribute";
+        private const string DISPLAY_ATTRIBUTE = "ZBase.Foundation.EnumExtensions.DisplayAttribute";
 
         public EnumDeclarationSyntax Syntax { get; private set; }
 
@@ -70,26 +68,8 @@ namespace ZBase.Foundation.EnumExtensions
 
                 foreach (var attribute in member.GetAttributes())
                 {
-                    if (attribute.AttributeClass?.Name == "DisplayAttribute")
-                    {
-                        var attribName = attribute.AttributeClass.ToDisplayString();
-
-                        if (attribName == DISPLAY_ATTRIBUTE || attribName == ENUM_DISPLAY_ATTRIBUTE)
-                        {
-                            foreach (var namedArgument in attribute.NamedArguments)
-                            {
-                                if (namedArgument.Key == "Name" && namedArgument.Value.Value?.ToString() is { } dn)
-                                {
-                                    // found display attribute, all done
-                                    displayName = dn;
-                                    goto ADD_DISPLAY_NAME;
-                                }
-                            }
-                        }
-                    }
-
-                    if (attribute.AttributeClass?.Name == "DescriptionAttribute"
-                        && attribute.AttributeClass.ToDisplayString() == DESCRIPTION_ATTRIBUTE
+                    if (attribute.AttributeClass?.Name == "DisplayAttribute"
+                        && attribute.AttributeClass.ToDisplayString() == DISPLAY_ATTRIBUTE
                         && attribute.ConstructorArguments.Length == 1
                     )
                     {
