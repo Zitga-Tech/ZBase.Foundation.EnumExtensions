@@ -3,7 +3,7 @@
 namespace EnumExtensionsTests
 {
     [EnumExtensions]
-    public enum MyEnum
+    internal enum MyEnum
     {
         A, B, C
     }
@@ -13,10 +13,44 @@ namespace EnumExtensionsTests
 
     }
 
-    public class Program
+    public partial class Program
     {
         public void Do()
         {
+        }
+
+        [EnumExtensions]
+        private enum Enumz
+        {
+            X, Y, Z
+        }
+
+        partial class EnumzExtensions { }
+
+        [EnumExtensionsFor(typeof(Enumz))]
+        private static partial class EnumZZZ { }
+    }
+
+    public enum BuiltInEnum
+    {
+        C, D, K
+    }
+
+    [EnumExtensionsFor(typeof(BuiltInEnum))]
+    internal static partial class ExtensionsForBuiltInEnum
+    {
+
+    }
+}
+
+namespace UsingEnumExtensions
+{
+    public partial class Program
+    {
+        [EnumExtensionsFor(typeof(EnumExtensionsTests.BuiltInEnum))]
+        public static partial class ExtensionsForBuiltInEnum
+        {
+
         }
     }
 }

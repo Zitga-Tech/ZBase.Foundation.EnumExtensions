@@ -3,7 +3,7 @@
 namespace ZBase.Foundation.EnumExtensions
 {
     /// <summary>
-    /// Add to enums that want to be extended
+    /// Add to any enum that should be extended.
     /// </summary>
     [AttributeUsage(AttributeTargets.Enum, AllowMultiple = false)]
     public class EnumExtensionsAttribute : Attribute
@@ -18,6 +18,40 @@ namespace ZBase.Foundation.EnumExtensions
         public DisplayAttribute(string value)
         {
             this.Value = value;
+        }
+    }
+
+    /// <summary>
+    /// Add to any static class that should extend an enum.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public class EnumExtensionsForAttribute : Attribute
+    {
+        public Type EnumType { get; }
+
+        public EnumExtensionsForAttribute(Type enumType)
+        {
+            if (enumType == null)
+                throw new ArgumentNullException(nameof(enumType));
+
+            if (enumType.IsEnum == false)
+                throw new InvalidOperationException($"{enumType} is not an enum.");
+
+            EnumType = enumType;
+        }
+    }
+}
+
+namespace ZBase.Foundation.EnumExtensions.SourceGen
+{
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public class GeneratedEnumExtensionsForAttribute : Attribute
+    {
+        public Type EnumType { get; }
+
+        public GeneratedEnumExtensionsForAttribute(Type enumType)
+        {
+            EnumType = enumType;
         }
     }
 }

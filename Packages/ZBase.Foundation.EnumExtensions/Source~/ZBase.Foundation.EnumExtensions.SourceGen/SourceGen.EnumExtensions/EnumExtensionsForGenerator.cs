@@ -8,9 +8,9 @@ using ZBase.Foundation.SourceGen;
 namespace ZBase.Foundation.EnumExtensions
 {
     [Generator]
-    public class EnumExtensionsGenerator : IIncrementalGenerator
+    public class EnumExtensionsForGenerator : IIncrementalGenerator
     {
-        public const string ENUM_EXTENSIONS_ATTRIBUTE = "global::ZBase.Foundation.EnumExtensions.EnumExtensionsAttribute";
+        public const string ENUM_EXTENSIONS_FOR_ATTRIBUTE = "global::ZBase.Foundation.EnumExtensions.EnumExtensionsForAttribute";
         public const string FLAGS_ATTRIBUTE = "global::System.FlagsAttribute";
         public const string GENERATOR_NAME = nameof(EnumExtensionsGenerator);
 
@@ -19,7 +19,7 @@ namespace ZBase.Foundation.EnumExtensions
             var projectPathProvider = SourceGenHelpers.GetSourceGenConfigProvider(context);
 
             var candidateProvider = context.SyntaxProvider.CreateSyntaxProvider(
-                predicate: IsValidEnumSyntax,
+                predicate: IsValidClassSyntax,
                 transform: GetSemanticSymbolMatch
             ).Where(t => t.syntax is { } && t.symbol is { });
 
@@ -28,7 +28,7 @@ namespace ZBase.Foundation.EnumExtensions
 
             context.RegisterSourceOutput(combined, (sourceProductionContext, source) => {
                 GenerateOutput(
-                    sourceProductionContext
+                      sourceProductionContext
                     , source.Left.Right
                     , source.Left.Left
                     , source.Right.projectPath
@@ -37,11 +37,11 @@ namespace ZBase.Foundation.EnumExtensions
             });
         }
 
-        private static bool IsValidEnumSyntax(SyntaxNode node, CancellationToken _)
+        private static bool IsValidClassSyntax(SyntaxNode node, CancellationToken _)
         {
-            return node is EnumDeclarationSyntax syntax
+            return node is ClassDeclarationSyntax syntax
                 && syntax.AttributeLists.Count > 0
-                && syntax.HasAttributeCandidate("ZBase.Foundation.EnumExtensions", "EnumExtensions")
+                && syntax.HasAttributeCandidate("ZBase.Foundation.EnumExtensions", "EnumExtensionsFor")
                 ;
         }
 
@@ -52,23 +52,70 @@ namespace ZBase.Foundation.EnumExtensions
         {
             token.ThrowIfCancellationRequested();
 
-            if (context.Node is not EnumDeclarationSyntax syntax)
+            if (context.Node is not ClassDeclarationSyntax syntax)
             {
                 return default;
             }
 
             var semanticModel = context.SemanticModel;
-            var symbol = semanticModel.GetDeclaredSymbol(syntax, token);
+            var classSymbol = semanticModel.GetDeclaredSymbol(syntax, token);
 
-            if (symbol == null || symbol.HasAttribute(ENUM_EXTENSIONS_ATTRIBUTE) == false)
+            if (classSymbol == null || classSymbol.IsStatic == false)
             {
                 return default;
+            }
+
+            var attribute = classSymbol.GetAttribute(ENUM_EXTENSIONS_FOR_ATTRIBUTE);
+
+            if (attribute == null || attribute.ConstructorArguments.Length < 1)
+            {
+                return default;
+            }
+
+            INamedTypeSymbol symbol = null;
+
+            foreach (var attribList in syntax.AttributeLists)
+            {
+                foreach (var attrib in attribList.Attributes)
+                {
+                    if (attrib.Name.IsTypeNameCandidate("ZBase.Foundation.EnumExtensions", "EnumExtensionsFor") == false
+                        || attrib.ArgumentList == null
+                        || attrib.ArgumentList.Arguments.Count < 1
+                    )
+                    {
+                        continue;
+                    }
+
+                    var arg = attrib.ArgumentList.Arguments[0];
+                    var expr = arg.Expression;
+
+                    if (expr is TypeOfExpressionSyntax typeOfExpr)
+                    {
+                        var candidate = semanticModel.GetSymbolInfo(typeOfExpr.Type, token).Symbol as INamedTypeSymbol;
+
+                        if (candidate.TypeKind == TypeKind.Enum)
+                        {
+                            symbol = candidate;
+                        }
+                    }
+
+                    if (symbol != null)
+                    {
+                        break;
+                    }
+                }
+
+                if (symbol != null)
+                {
+                    break;
+                }
             }
 
             return new MatchedSemantic {
                 syntax = syntax,
                 symbol = symbol,
                 hasFlags = symbol.HasAttribute(FLAGS_ATTRIBUTE),
+                accessibility = classSymbol.DeclaredAccessibility,
             };
         }
 
@@ -96,8 +143,8 @@ namespace ZBase.Foundation.EnumExtensions
                       candidate.symbol
                     , candidate.hasFlags
                     , candidate.syntax.Parent is NamespaceDeclarationSyntax
-                    , $"{candidate.symbol.Name}Extensions"
-                    , candidate.symbol.DeclaredAccessibility
+                    , candidate.syntax.Identifier.Text
+                    , candidate.accessibility
                 );
 
                 var source = declaration.WriteCode();
@@ -140,10 +187,10 @@ namespace ZBase.Foundation.EnumExtensions
         }
 
         private static readonly DiagnosticDescriptor s_errorDescriptor
-            = new("SG_ENUM_EXTENSIONS_01"
-                , "Enum Extensions Generator Error"
-                , "This error indicates a bug in the Enum Extensions source generators. Error message: '{0}'."
-                , "ZBase.Foundation.EnumExtensions.EnumExtensionsAttribute"
+            = new("SG_ENUM_EXTENSIONS_02"
+                , "Enum Extensions For Generator Error"
+                , "This error indicates a bug in the Enum Extensions For source generators. Error message: '{0}'."
+                , "ZBase.Foundation.EnumExtensions.EnumExtensionsForAttribute"
                 , DiagnosticSeverity.Error
                 , isEnabledByDefault: true
                 , description: ""
@@ -151,9 +198,10 @@ namespace ZBase.Foundation.EnumExtensions
 
         private struct MatchedSemantic
         {
-            public EnumDeclarationSyntax syntax;
+            public ClassDeclarationSyntax syntax;
             public INamedTypeSymbol symbol;
             public bool hasFlags;
+            public Accessibility accessibility;
         }
     }
 }

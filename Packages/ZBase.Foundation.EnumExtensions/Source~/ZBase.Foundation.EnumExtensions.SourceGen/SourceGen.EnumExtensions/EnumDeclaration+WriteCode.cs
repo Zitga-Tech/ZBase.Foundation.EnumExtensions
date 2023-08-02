@@ -11,24 +11,45 @@ namespace ZBase.Foundation.EnumExtensions
 
         public string WriteCode()
         {
-            var enumName = Syntax.Identifier.Text;
-            var typeName = $"{enumName}Extensions";
             var p = Printer.DefaultLarge;
-            var @this = Syntax.Parent is NamespaceDeclarationSyntax ? "this " : "";
+            var @this = ParentIsNamespace ? "this " : "";
 
             p = p.IncreasedIndent();
             {
                 p.PrintEndLine();
 
                 p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+
+                p.PrintBeginLine("[global::ZBase.Foundation.EnumExtensions.SourceGen.GeneratedEnumExtensionsFor(typeof(")
+                    .Print(FullyQualifiedName)
+                    .PrintEndLine("))]");
+
                 p.PrintBeginLine();
                 {
-                    if (IsPublic)
-                        p.Print("public ");
-                    else
-                        p.Print("internal ");
+                    switch (Accessibility)
+                    {
+                        case Microsoft.CodeAnalysis.Accessibility.Internal:
+                            p.Print("internal ");
+                            break;
 
-                    p.Print("static partial class ").Print(typeName);
+                        case Microsoft.CodeAnalysis.Accessibility.Private:
+                            p.Print("private ");
+                            break;
+
+                        case Microsoft.CodeAnalysis.Accessibility.ProtectedAndInternal:
+                            p.Print("private protected ");
+                            break;
+
+                        case Microsoft.CodeAnalysis.Accessibility.ProtectedOrInternal:
+                            p.Print("protected internal ");
+                            break;
+
+                        default:
+                            p.Print("public ");
+                            break;
+                    }
+
+                    p.Print("static partial class ").Print(ExtensionsName);
                 }
                 p.PrintEndLine();
 
@@ -182,9 +203,9 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// <param name=\"name\">The name to check if it's defined</param>");
                     p.PrintLine("/// <returns><c>true</c> if a member with the name exists in the enumeration, <c>false</c> otherwise</returns>");
                     p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static bool IsDefined{enumName}({@this}string name)");
+                    p.PrintLine($"public static bool IsDefined{EnumName}({@this}string name)");
                     p = p.IncreasedIndent();
-                    p.PrintLine($"=> IsDefined{enumName}(name, allowMatchingMetadataAttribute: false);");
+                    p.PrintLine($"=> IsDefined{EnumName}(name, allowMatchingMetadataAttribute: false);");
                     p = p.DecreasedIndent();
 
                     p.PrintEndLine();
@@ -199,7 +220,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// <returns><c>true</c> if a member with the name exists in the enumeration, or a member is decorated");
                     p.PrintLine("/// with a <c>[Display]</c> attribute with the name, <c>false</c> otherwise</returns>");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static bool IsDefined{enumName}({@this}string name, bool allowMatchingMetadataAttribute)");
+                    p.PrintLine($"public static bool IsDefined{EnumName}({@this}string name, bool allowMatchingMetadataAttribute)");
                     p.OpenScope();
                     {
                         if (IsDisplayAttributeUsed)
@@ -681,7 +702,7 @@ namespace ZBase.Foundation.EnumExtensions
                             p.PrintLine($"public static global::Unity.Collections.NativeArray<{FixedStringTypeName}> AsNativeArray(global::Unity.Collections.Allocator allocator)");
                             p.OpenScope();
                             {
-                                p.PrintLine($"var names = new global::Unity.Collections.NativeArray<{FixedStringTypeName}>({typeName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
+                                p.PrintLine($"var names = new global::Unity.Collections.NativeArray<{FixedStringTypeName}>({ExtensionsName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
 
                                 var index = 0;
 
@@ -770,7 +791,7 @@ namespace ZBase.Foundation.EnumExtensions
                             p.PrintLine($"public static global::Unity.Collections.NativeArray<{FixedStringTypeName}> AsNativeArray(global::Unity.Collections.Allocator allocator)");
                             p.OpenScope();
                             {
-                                p.PrintLine($"var names = new global::Unity.Collections.NativeArray<{FixedStringTypeName}>({typeName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
+                                p.PrintLine($"var names = new global::Unity.Collections.NativeArray<{FixedStringTypeName}>({ExtensionsName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
 
                                 var index = 0;
 

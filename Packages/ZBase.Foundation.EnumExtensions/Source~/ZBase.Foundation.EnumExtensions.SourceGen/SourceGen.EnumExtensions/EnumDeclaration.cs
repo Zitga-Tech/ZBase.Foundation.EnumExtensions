@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,7 +10,11 @@ namespace ZBase.Foundation.EnumExtensions
     {
         private const string DISPLAY_ATTRIBUTE = "ZBase.Foundation.EnumExtensions.DisplayAttribute";
 
-        public EnumDeclarationSyntax Syntax { get; private set; }
+        public string EnumName { get; private set; }
+
+        public string ExtensionsName { get; private set; }
+
+        public bool ParentIsNamespace { get; private set; }
 
         public string FullyQualifiedName { get; private set; }
 
@@ -19,7 +22,7 @@ namespace ZBase.Foundation.EnumExtensions
 
         public EquatableArray<(string Key, EnumValueOption Value)> Names { get; private set; }
 
-        public bool IsPublic { get; private set; }
+        public Accessibility Accessibility { get; private set; }
 
         public bool HasFlags { get; private set; }
 
@@ -30,15 +33,19 @@ namespace ZBase.Foundation.EnumExtensions
         public bool IsDisplayAttributeUsed { get; private set; }
 
         public EnumDeclaration(
-              EnumDeclarationSyntax syntax
-            , INamedTypeSymbol symbol
+              INamedTypeSymbol symbol
             , bool hasFlags
+            , bool parentIsNamespace
+            , string extensionsName
+            , Accessibility accessibility
         )
         {
-            Syntax = syntax;
+            EnumName = symbol.Name;
+            ExtensionsName = extensionsName;
+            ParentIsNamespace = parentIsNamespace;
             FullyQualifiedName = symbol.ToFullName();
             UnderlyingTypeName = symbol.EnumUnderlyingType.ToString();
-            IsPublic = symbol.DeclaredAccessibility == Accessibility.Public;
+            Accessibility = accessibility;
             HasFlags = hasFlags;
 
             foreach (var assembly in symbol.ContainingModule.ReferencedAssemblySymbols)
