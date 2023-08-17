@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using ZBase.Foundation.SourceGen;
+﻿using ZBase.Foundation.SourceGen;
 
 namespace ZBase.Foundation.EnumExtensions
 {
@@ -8,6 +7,7 @@ namespace ZBase.Foundation.EnumExtensions
         private const string AGGRESSIVE_INLINING = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]";
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.EnumExtensions.EnumExtensionsGenerator\", \"1.0.2\")]";
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
+        private const string UNITY_COLLECTIONS_ALLOCATOR = "global::Unity.Collections.AllocatorManager.AllocatorHandle";
 
         public string WriteCode()
         {
@@ -522,9 +522,9 @@ namespace ZBase.Foundation.EnumExtensions
                             p.PrintEndLine();
 
                             p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                            p.PrintLine($"public static global::Unity.Collections.NativeArray<{FullyQualifiedName}>.ReadOnly AsNativeArray(global::Unity.Collections.Allocator allocator)");
+                            p.PrintLine($"public static global::Unity.Collections.NativeArray<{FullyQualifiedName}>.ReadOnly AsNativeArray({UNITY_COLLECTIONS_ALLOCATOR} allocator)");
                             p = p.IncreasedIndent();
-                            p.PrintLine($"=> new global::Unity.Collections.NativeArray<{FullyQualifiedName}>(s_values, allocator).AsReadOnly();");
+                            p.PrintLine($"=> global::Unity.Collections.CollectionHelper.CreateNativeArray<{FullyQualifiedName}>(s_values, allocator).AsReadOnly();");
                             p = p.DecreasedIndent();
                         }
                     }
@@ -556,9 +556,9 @@ namespace ZBase.Foundation.EnumExtensions
                             p.PrintEndLine();
 
                             p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                            p.PrintLine($"public static global::Unity.Collections.NativeArray<{UnderlyingTypeName}>.ReadOnly AsNativeArray(global::Unity.Collections.Allocator allocator)");
+                            p.PrintLine($"public static global::Unity.Collections.NativeArray<{UnderlyingTypeName}>.ReadOnly AsNativeArray({UNITY_COLLECTIONS_ALLOCATOR} allocator)");
                             p = p.IncreasedIndent();
-                            p.PrintLine($"=> new global::Unity.Collections.NativeArray<{UnderlyingTypeName}>(s_values, allocator).AsReadOnly();");
+                            p.PrintLine($"=> global::Unity.Collections.CollectionHelper.CreateNativeArray<{UnderlyingTypeName}>(s_values, allocator).AsReadOnly();");
                             p = p.DecreasedIndent();
                         }
                     }
@@ -699,10 +699,10 @@ namespace ZBase.Foundation.EnumExtensions
                             }
 
                             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                            p.PrintLine($"public static global::Unity.Collections.NativeArray<{FixedStringTypeName}> AsNativeArray(global::Unity.Collections.Allocator allocator)");
+                            p.PrintLine($"public static global::Unity.Collections.NativeArray<{FixedStringTypeName}> AsNativeArray({UNITY_COLLECTIONS_ALLOCATOR} allocator)");
                             p.OpenScope();
                             {
-                                p.PrintLine($"var names = new global::Unity.Collections.NativeArray<{FixedStringTypeName}>({ExtensionsName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
+                                p.PrintLine($"var names = global::Unity.Collections.CollectionHelper.CreateNativeArray<{FixedStringTypeName}>({ExtensionsName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
 
                                 var index = 0;
 
@@ -788,10 +788,10 @@ namespace ZBase.Foundation.EnumExtensions
                             }
 
                             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                            p.PrintLine($"public static global::Unity.Collections.NativeArray<{FixedStringTypeName}> AsNativeArray(global::Unity.Collections.Allocator allocator)");
+                            p.PrintLine($"public static global::Unity.Collections.NativeArray<{FixedStringTypeName}> AsNativeArray({UNITY_COLLECTIONS_ALLOCATOR} allocator)");
                             p.OpenScope();
                             {
-                                p.PrintLine($"var names = new global::Unity.Collections.NativeArray<{FixedStringTypeName}>({ExtensionsName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
+                                p.PrintLine($"var names = global::Unity.Collections.CollectionHelper.CreateNativeArray<{FixedStringTypeName}>({ExtensionsName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
 
                                 var index = 0;
 
