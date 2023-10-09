@@ -716,7 +716,7 @@ namespace ZBase.Foundation.EnumExtensions
                                     p.OpenScope();
                                     {
                                         p.PrintLine($"var fs = new {FixedStringTypeName}();");
-                                        p.PrintLine($"global::Unity.Collections.FixedStringMethods.Append(ref fs, ({FixedStringTypeName})nameof({FullyQualifiedName}.{key}));");
+                                        p.PrintLine($"global::Unity.Collections.FixedStringMethods.Append(ref fs, ({FixedStringTypeName})Names.{key});");
                                         p.PrintLine("return fs;");
                                     }
                                     p.CloseScope();
@@ -803,7 +803,7 @@ namespace ZBase.Foundation.EnumExtensions
                                         p.OpenScope();
                                         {
                                             p.PrintLine($"var fs = new {FixedStringTypeName}();");
-                                            p.PrintLine($"global::Unity.Collections.FixedStringMethods.Append(ref fs, ({FixedStringTypeName})nameof({FullyQualifiedName}.{key}));");
+                                            p.PrintLine($"global::Unity.Collections.FixedStringMethods.Append(ref fs, ({FixedStringTypeName})DisplayNames.{key});");
                                             p.PrintLine("return fs;");
                                         }
                                         p.CloseScope();
