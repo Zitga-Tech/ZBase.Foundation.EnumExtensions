@@ -279,6 +279,33 @@ namespace ZBase.Foundation.EnumExtensions
 
                     p.PrintEndLine();
 
+                    if (HasFlags)
+                    {
+                        p.PrintLine("/// <summary>");
+                        p.PrintLine("/// Determines whether one or more bit fields are set in the current instance.");
+                        p.PrintLine("/// </summary>");
+                        p.PrintLine("/// <returns><c>true</c> if the bit field or bit fields that are set in <c>flag</c> are also set in the current instance; otherwise, <c>false</c>.</returns>");
+                        p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                        p.PrintLine($"public static bool Contains({@this}{FullyQualifiedName} value, {FullyQualifiedName} flag)");
+                        p = p.IncreasedIndent();
+                        p.PrintLine($"=> (value & flag) == flag;");
+                        p = p.DecreasedIndent();
+
+                        p.PrintEndLine();
+
+                        p.PrintLine("/// <summary>");
+                        p.PrintLine("/// Unsets one or more bit fields on the current instance.");
+                        p.PrintLine("/// </summary>");
+                        p.PrintLine("/// <returns>A new instance without bit fields that are set in <c>flags</c>.</returns>");
+                        p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                        p.PrintLine($"public static {FullyQualifiedName} Unset({@this}{FullyQualifiedName} value, {FullyQualifiedName} flag)");
+                        p = p.IncreasedIndent();
+                        p.PrintLine($"=> value & (~flag);");
+                        p = p.DecreasedIndent();
+
+                        p.PrintEndLine();
+                    }
+
                     p.PrintLine("/// <summary>");
                     p.PrintLine("/// Converts the string representation of the name or numeric value of");
                     p.PrintLine($"/// an <see cref=\"{FullyQualifiedName}\" /> to the equivalent instance.");
