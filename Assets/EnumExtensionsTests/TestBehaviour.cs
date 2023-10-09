@@ -1,3 +1,6 @@
+using Unity.Burst;
+using Unity.Jobs;
+using Unity.Logging;
 using UnityEngine;
 using ZBase.Foundation.EnumExtensions;
 
@@ -8,6 +11,9 @@ namespace EnumExtensionsTests
         private void Start()
         {
             Debug.Log(ComponentTypeExtensions.ToStringFast(ComponentType.SpriteRenderer));
+
+            var job = new MyJob();
+            job.Schedule();
         }
 
         [EnumExtensions]
@@ -18,6 +24,17 @@ namespace EnumExtensionsTests
 
             [Display("Sprite Renderer")]
             SpriteRenderer,
+        }
+    }
+
+    [BurstCompile]
+    public partial struct MyJob : IJob
+    {
+        [BurstCompile]
+        public void Execute()
+        {
+            var name = MyFlags.A.ToFixedDisplayStringFast();
+            Log.Info(name);
         }
     }
 }

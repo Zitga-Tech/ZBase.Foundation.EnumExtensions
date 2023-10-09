@@ -2,7 +2,9 @@
     "name": "EnumExtensionsTests",
     "rootNamespace": "EnumExtensionsTests",
     "references": [
+        "Unity.Burst",
         "Unity.Collections",
+        "Unity.Logging",
         "ZBase.Foundation.EnumExtensions"
     ],
     "includePlatforms": [],

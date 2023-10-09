@@ -1,4 +1,5 @@
-﻿using ZBase.Foundation.EnumExtensions;
+﻿using System;
+using ZBase.Foundation.EnumExtensions;
 
 namespace EnumExtensionsTests
 {
@@ -38,6 +39,19 @@ namespace EnumExtensionsTests
 
     [EnumExtensionsFor(typeof(BuiltInEnum))]
     internal static partial class ExtensionsForBuiltInEnum
+    {
+
+    }
+
+    [Flags, EnumExtensions]
+    public enum DirectionFlag : byte
+    {
+        None           = 0b_0000_0000,
+        TargetLocation = 0b_0000_0001,
+        Upward         = 0b_0000_0010,
+    }
+
+    partial class DirectionFlagExtensions
     {
 
     }
