@@ -203,9 +203,9 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// <param name=\"name\">The name to check if it's defined</param>");
                     p.PrintLine("/// <returns><c>true</c> if a member with the name exists in the enumeration, <c>false</c> otherwise</returns>");
                     p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static bool IsDefined{EnumName}({@this}string name)");
+                    p.PrintLine($"public static bool IsDefinedIn({@this}string name, {FullyQualifiedName} _)");
                     p = p.IncreasedIndent();
-                    p.PrintLine($"=> IsDefined{EnumName}(name, allowMatchingMetadataAttribute: false);");
+                    p.PrintLine($"=> IsDefinedIn(name, default({FullyQualifiedName}), allowMatchingMetadataAttribute: false);");
                     p = p.DecreasedIndent();
 
                     p.PrintEndLine();
@@ -216,11 +216,11 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// with the required name exists.");
                     p.PrintLine("/// </summary>");
                     p.PrintLine("/// <param name=\"name\">The name to check if it's defined</param>");
-                    p.PrintLine("/// <param name=\"allowMatchingMetadataAttribute\">If <c>true</c>, considers the value of metadata attributes,otherwise ignores them</param>");
+                    p.PrintLine("/// <param name=\"allowMatchingMetadataAttribute\">If <c>true</c>, considers the value of metadata attributes, otherwise ignores them</param>");
                     p.PrintLine("/// <returns><c>true</c> if a member with the name exists in the enumeration, or a member is decorated");
                     p.PrintLine("/// with a <c>[Display]</c> attribute with the name, <c>false</c> otherwise</returns>");
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static bool IsDefined{EnumName}({@this}string name, bool allowMatchingMetadataAttribute)");
+                    p.PrintLine($"public static bool IsDefinedIn({@this}string name, {FullyQualifiedName} _, bool allowMatchingMetadataAttribute)");
                     p.OpenScope();
                     {
                         if (IsDisplayAttributeUsed)
