@@ -20,7 +20,7 @@ namespace ZBase.Foundation.EnumExtensions
 
         public string UnderlyingTypeName { get; private set; }
 
-        public EquatableArray<(string Key, EnumValueOption Value)> Names { get; private set; }
+        public EquatableArray<(string Key, EnumValueOption Value)> Members { get; private set; }
 
         public Accessibility Accessibility { get; private set; }
 
@@ -66,7 +66,8 @@ namespace ZBase.Foundation.EnumExtensions
             foreach (var member in enumMembers)
             {
                 if (member is not IFieldSymbol field
-                    || field.ConstantValue is null)
+                    || field.ConstantValue is null
+                )
                 {
                     continue;
                 }
@@ -75,7 +76,14 @@ namespace ZBase.Foundation.EnumExtensions
 
                 foreach (var attribute in member.GetAttributes())
                 {
-                    if (attribute.AttributeClass?.Name == "DisplayAttribute"
+                    var attributeName = attribute.AttributeClass?.Name ?? string.Empty;
+
+                    if (attributeName == nameof(System.ObsoleteAttribute))
+                    {
+                        goto CONTINUE;
+                    }
+
+                    if (attributeName == "DisplayAttribute"
                         && attribute.AttributeClass.ToDisplayString() == DISPLAY_ATTRIBUTE
                         && attribute.ConstructorArguments.Length == 1
                     )
@@ -90,20 +98,28 @@ namespace ZBase.Foundation.EnumExtensions
                 }
 
                 ADD_DISPLAY_NAME:
-                if (displayName is not null)
                 {
-                    isDisplayNameTheFirstPresence = displayNames.Add(displayName);
+                    if (displayName is not null)
+                    {
+                        isDisplayNameTheFirstPresence = displayNames.Add(displayName);
+                    }
+
+                    var nameByteCount = GetByteCount(member.Name);
+                    var displayNameByteCount = GetByteCount(displayName);
+                    var byteCount = Math.Max(nameByteCount, displayNameByteCount);
+                    maxByteCount = Math.Max(maxByteCount, byteCount);
+
+                    members.Add((member.Name, new EnumValueOption(displayName, isDisplayNameTheFirstPresence)));
+                    continue;
                 }
 
-                var nameByteCount = GetByteCount(member.Name);
-                var displayNameByteCount = GetByteCount(displayName);
-                var byteCount = Math.Max(nameByteCount, displayNameByteCount);
-                maxByteCount = Math.Max(maxByteCount, byteCount);
-
-                members.Add((member.Name, new EnumValueOption(displayName, isDisplayNameTheFirstPresence)));
+                CONTINUE:
+                {
+                    continue;
+                }
             }
 
-            Names = new EquatableArray<(string Key, EnumValueOption Value)>(members.ToArray());
+            Members = new EquatableArray<(string Key, EnumValueOption Value)>(members.ToArray());
             IsDisplayAttributeUsed = displayNames.Count > 0;
 
             if (ReferenceUnityCollections)

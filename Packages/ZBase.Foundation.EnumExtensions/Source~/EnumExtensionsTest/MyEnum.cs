@@ -48,6 +48,8 @@ namespace EnumExtensionsTests
     {
         None           = 0b_0000_0000,
         TargetLocation = 0b_0000_0001,
+
+        [Obsolete]
         Upward         = 0b_0000_0010,
     }
 

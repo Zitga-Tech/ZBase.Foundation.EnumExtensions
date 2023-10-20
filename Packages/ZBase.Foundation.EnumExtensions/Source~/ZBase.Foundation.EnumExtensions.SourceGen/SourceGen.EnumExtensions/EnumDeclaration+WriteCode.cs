@@ -60,7 +60,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("/// This is a non-distinct count of defined names.");
                     p.PrintLine("/// </summary>");
                     p.PrintLine(GENERATED_CODE);
-                    p.PrintLine($"public const int Length = {Names.Count};");
+                    p.PrintLine($"public const int Length = {Members.Count};");
 
                     p.PrintEndLine();
 
@@ -184,7 +184,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintLine("=> value switch");
                         p.OpenScope();
                         {
-                            foreach (var (key, _) in Names)
+                            foreach (var (key, _) in Members)
                             {
                                 p.PrintLine($"{FullyQualifiedName}.{key} => true,");
                             }
@@ -233,7 +233,7 @@ namespace ZBase.Foundation.EnumExtensions
                                 p.PrintLine("isDefinedInDisplayAttribute = name switch");
                                 p.OpenScope();
                                 {
-                                    foreach (var (key, value) in Names)
+                                    foreach (var (key, value) in Members)
                                     {
                                         if (value.DisplayName is not null && value.IsDisplayNameTheFirstPresence)
                                         {
@@ -258,7 +258,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintLine("return name switch");
                         p.OpenScope();
                         {
-                            foreach (var (key, _) in Names)
+                            foreach (var (key, _) in Members)
                             {
                                 p.PrintLine($"Names.{key} => true,");
                             }
@@ -385,7 +385,7 @@ namespace ZBase.Foundation.EnumExtensions
                                     p.PrintLine("switch (name)");
                                     p.OpenScope();
                                     {
-                                        foreach (var (key, value) in Names)
+                                        foreach (var (key, value) in Members)
                                         {
                                             if (value.DisplayName is not null && value.IsDisplayNameTheFirstPresence)
                                             {
@@ -410,7 +410,7 @@ namespace ZBase.Foundation.EnumExtensions
                                     p.PrintLine("switch (name)");
                                     p.OpenScope();
                                     {
-                                        foreach (var (key, value) in Names)
+                                        foreach (var (key, value) in Members)
                                         {
                                             if (value.DisplayName is not null && value.IsDisplayNameTheFirstPresence)
                                             {
@@ -439,7 +439,7 @@ namespace ZBase.Foundation.EnumExtensions
                             p.PrintLine("switch (name)");
                             p.OpenScope();
                             {
-                                foreach (var (key, _) in Names)
+                                foreach (var (key, _) in Members)
                                 {
                                     p.PrintLine($"case string s when s.Equals(Names.{key}, global::System.StringComparison.OrdinalIgnoreCase):");
                                     p.OpenScope();
@@ -475,7 +475,7 @@ namespace ZBase.Foundation.EnumExtensions
                             p.PrintLine("switch (name)");
                             p.OpenScope();
                             {
-                                foreach (var (key, _) in Names)
+                                foreach (var (key, _) in Members)
                                 {
                                     p.PrintLine($"case Names.{key}:");
                                     p.OpenScope();
@@ -532,7 +532,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintLine($"private static readonly {FullyQualifiedName}[] s_values = new {FullyQualifiedName}[]");
                         p.OpenScope();
                         {
-                            foreach (var (key, _) in Names)
+                            foreach (var (key, _) in Members)
                             {
                                 p.PrintLine($"{FullyQualifiedName}.{key},");
                             }
@@ -566,7 +566,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintLine($"private static readonly {UnderlyingTypeName}[] s_values = new {UnderlyingTypeName}[]");
                         p.OpenScope();
                         {
-                            foreach (var (key, _) in Names)
+                            foreach (var (key, _) in Members)
                             {
                                 p.PrintLine($"ToUnderlyingValue({FullyQualifiedName}.{key}),");
                             }
@@ -597,7 +597,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("public static class Names");
                     p.OpenScope();
                     {
-                        foreach (var (key, _) in Names)
+                        foreach (var (key, _) in Members)
                         {
                             p.PrintLine(GENERATED_CODE);
                             p.PrintLine($"public const string {key} = nameof({FullyQualifiedName}.{key});");
@@ -607,7 +607,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintLine($"private static readonly string[] s_names = new string[]");
                         p.OpenScope();
                         {
-                            foreach (var (key, _) in Names)
+                            foreach (var (key, _) in Members)
                             {
                                 p.PrintLine($"{key},");
                             }
@@ -627,7 +627,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintLine("=> value switch");
                         p.OpenScope();
                         {
-                            foreach (var (key, _) in Names)
+                            foreach (var (key, _) in Members)
                             {
                                 p.PrintLine($"{FullyQualifiedName}.{key} => {key},");
                             }
@@ -646,7 +646,7 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine("public static class DisplayNames");
                     p.OpenScope();
                     {
-                        foreach (var (key, value) in Names)
+                        foreach (var (key, value) in Members)
                         {
                             p.PrintLine(GENERATED_CODE);
 
@@ -665,7 +665,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintLine($"private static readonly string[] s_names = new string[]");
                         p.OpenScope();
                         {
-                            foreach (var (key, _) in Names)
+                            foreach (var (key, _) in Members)
                             {
                                 p.PrintLine($"{key},");
                             }
@@ -685,7 +685,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintLine("=> value switch");
                         p.OpenScope();
                         {
-                            foreach (var (key, _) in Names)
+                            foreach (var (key, _) in Members)
                             {
                                 p.PrintLine($"{FullyQualifiedName}.{key} => {key},");
                             }
@@ -706,7 +706,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintLine("public static class FixedNames");
                         p.OpenScope();
                         {
-                            foreach (var (key, _) in Names)
+                            foreach (var (key, _) in Members)
                             {
                                 p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                                 p.PrintLine($"public static {FixedStringTypeName} {key}");
@@ -733,12 +733,12 @@ namespace ZBase.Foundation.EnumExtensions
 
                                 var index = 0;
 
-                                foreach (var (key, _) in Names)
+                                foreach (var (key, _) in Members)
                                 {
                                     p.PrintLine($"names[{index}] = {key};");
                                     index++;
 
-                                    if (index >= Names.Count)
+                                    if (index >= Members.Count)
                                     {
                                         break;
                                     }
@@ -756,7 +756,7 @@ namespace ZBase.Foundation.EnumExtensions
                             p.PrintLine($"=> value switch");
                             p.OpenScope();
                             {
-                                foreach (var (key, _) in Names)
+                                foreach (var (key, _) in Members)
                                 {
                                     p.PrintLine($"{FullyQualifiedName}.{key} => {key},");
                                 }
@@ -774,7 +774,7 @@ namespace ZBase.Foundation.EnumExtensions
                         p.PrintLine("public static class FixedDisplayNames");
                         p.OpenScope();
                         {
-                            foreach (var (key, value) in Names)
+                            foreach (var (key, value) in Members)
                             {
                                 p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
 
@@ -822,12 +822,12 @@ namespace ZBase.Foundation.EnumExtensions
 
                                 var index = 0;
 
-                                foreach (var (key, _) in Names)
+                                foreach (var (key, _) in Members)
                                 {
                                     p.PrintLine($"names[{index}] = {key};");
                                     index++;
 
-                                    if (index >= Names.Count)
+                                    if (index >= Members.Count)
                                     {
                                         break;
                                     }
@@ -845,7 +845,7 @@ namespace ZBase.Foundation.EnumExtensions
                             p.PrintLine($"=> value switch");
                             p.OpenScope();
                             {
-                                foreach (var (key, _) in Names)
+                                foreach (var (key, _) in Members)
                                 {
                                     p.PrintLine($"{FullyQualifiedName}.{key} => {key},");
                                 }

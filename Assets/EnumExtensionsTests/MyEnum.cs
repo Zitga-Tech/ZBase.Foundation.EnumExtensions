@@ -19,6 +19,8 @@ namespace EnumExtensionsTests
         [Display("And")]
         A    = 0b_0000_0001,
         B    = 0b_0000_0010,
+
+        [Obsolete]
         C    = 0b_0000_0100,
     }
 
