@@ -282,13 +282,25 @@ namespace ZBase.Foundation.EnumExtensions
                     if (HasFlags)
                     {
                         p.PrintLine("/// <summary>");
-                        p.PrintLine("/// Determines whether one or more bit fields are set in the current instance.");
+                        p.PrintLine("/// Determines whether some of the bit fields are set in the current instance.");
                         p.PrintLine("/// </summary>");
-                        p.PrintLine("/// <returns><c>true</c> if the bit field or bit fields that are set in <c>flag</c> are also set in the current instance; otherwise, <c>false</c>.</returns>");
+                        p.PrintLine("/// <returns><c>true</c> if all of the bit fields that are set in <c>flag</c> are also set in the current instance; otherwise, <c>false</c>.</returns>");
                         p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                         p.PrintLine($"public static bool Contains({@this}{FullyQualifiedName} value, {FullyQualifiedName} flag)");
                         p = p.IncreasedIndent();
                         p.PrintLine($"=> (value & flag) == flag;");
+                        p = p.DecreasedIndent();
+
+                        p.PrintEndLine();
+                        
+                        p.PrintLine("/// <summary>");
+                        p.PrintLine("/// Determines whether any of the bit fields are set in the current instance.");
+                        p.PrintLine("/// </summary>");
+                        p.PrintLine("/// <returns><c>true</c> if any of the bit fields that are set in <c>flag</c> is also set in the current instance; otherwise, <c>false</c>.</returns>");
+                        p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                        p.PrintLine($"public static bool Any({@this}{FullyQualifiedName} value, {FullyQualifiedName} flag)");
+                        p = p.IncreasedIndent();
+                        p.PrintLine($"=> (value & flag) != 0;");
                         p = p.DecreasedIndent();
 
                         p.PrintEndLine();
