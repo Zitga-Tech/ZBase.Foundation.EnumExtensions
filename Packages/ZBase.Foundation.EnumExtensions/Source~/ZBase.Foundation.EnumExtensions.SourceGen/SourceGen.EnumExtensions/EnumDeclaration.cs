@@ -129,8 +129,7 @@ namespace ZBase.Foundation.EnumExtensions
                     <= 64 => "global::Unity.Collections.FixedString64Bytes",
                     <= 128 => "global::Unity.Collections.FixedString128Bytes",
                     <= 512 => "global::Unity.Collections.FixedString512Bytes",
-                    <= 4096 => "global::Unity.Collections.FixedString4096Bytes",
-                    _ => string.Empty,
+                    _ => "global::Unity.Collections.FixedString4096Bytes",
                 };
             }
         }
