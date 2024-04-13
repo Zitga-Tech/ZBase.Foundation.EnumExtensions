@@ -35,6 +35,7 @@ namespace EnumExtensionsTests
         {
             var name = MyFlags.A.ToFixedDisplayStringFast();
             Log.Info(name);
+            Log.Info(MyFlagsExtensions.FixedNames.B);
         }
     }
 }

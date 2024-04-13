@@ -8,10 +8,6 @@ namespace ZBase.Foundation.EnumExtensions
 {
     public partial class EnumDeclaration
     {
-        private const string DISPLAY_ATTRIBUTE = "ZBase.Foundation.EnumExtensions.DisplayAttribute";
-
-        public string EnumName { get; private set; }
-
         public string ExtensionsName { get; private set; }
 
         public bool ParentIsNamespace { get; private set; }
@@ -20,7 +16,7 @@ namespace ZBase.Foundation.EnumExtensions
 
         public string UnderlyingTypeName { get; private set; }
 
-        public EquatableArray<(string Key, EnumValueOption Value)> Members { get; private set; }
+        public List<EnumMemberDeclaration> Members { get; private set; }
 
         public Accessibility Accessibility { get; private set; }
 
@@ -32,6 +28,10 @@ namespace ZBase.Foundation.EnumExtensions
 
         public bool IsDisplayAttributeUsed { get; private set; }
 
+        public bool OnlyNames { get; private set; }
+
+        public bool NoDocumentation { get; private set; }
+
         public EnumDeclaration(
               INamedTypeSymbol symbol
             , bool hasFlags
@@ -40,7 +40,6 @@ namespace ZBase.Foundation.EnumExtensions
             , Accessibility accessibility
         )
         {
-            EnumName = symbol.Name;
             ExtensionsName = extensionsName;
             ParentIsNamespace = parentIsNamespace;
             FullyQualifiedName = symbol.ToFullName();
@@ -58,10 +57,9 @@ namespace ZBase.Foundation.EnumExtensions
             }
 
             var enumMembers = symbol.GetMembers();
-            var members = new List<(string, EnumValueOption)>(enumMembers.Length);
-            var displayNames = new HashSet<string>();
-            var isDisplayNameTheFirstPresence = false;
+            var members = Members = new List<EnumMemberDeclaration>(enumMembers.Length);
             var maxByteCount = 0;
+            var isDisplayAttributeUsed = false;
 
             foreach (var member in enumMembers)
             {
@@ -74,34 +72,57 @@ namespace ZBase.Foundation.EnumExtensions
 
                 string displayName = null;
 
-                foreach (var attribute in member.GetAttributes())
+                foreach (var attribute in field.GetAttributes())
                 {
                     var attributeName = attribute.AttributeClass?.Name ?? string.Empty;
 
-                    if (attributeName == nameof(System.ObsoleteAttribute))
+                    switch (attributeName)
                     {
-                        goto CONTINUE;
-                    }
-
-                    if (attributeName == "DisplayAttribute"
-                        && attribute.AttributeClass.ToDisplayString() == DISPLAY_ATTRIBUTE
-                        && attribute.ConstructorArguments.Length == 1
-                    )
-                    {
-                        if (attribute.ConstructorArguments[0].Value?.ToString() is { } dn)
+                        case nameof(System.ObsoleteAttribute):
                         {
-                            // found display attribute, all done
-                            displayName = dn;
-                            goto ADD_DISPLAY_NAME;
+                            goto CONTINUE;
+                        }
+
+                        case "DisplayAttribute":
+                        case "DisplayNameAttribute":
+                        case "InspectorNameAttribute":
+                        {
+                            if (attribute.ConstructorArguments.Length > 0)
+                            {
+                                var arg = attribute.ConstructorArguments[0];
+
+                                if (arg.Kind == TypedConstantKind.Primitive && arg.Value?.ToString() is string dn)
+                                {
+                                    displayName = dn;
+                                    goto ADD_DISPLAY_NAME;
+                                }
+                            }
+
+                            if (attribute.NamedArguments.Length > 0)
+                            {
+                                foreach (var arg in attribute.NamedArguments)
+                                {
+                                    if (arg.Key == "Name"
+                                        && arg.Value.Kind == TypedConstantKind.Primitive
+                                        && arg.Value.Value?.ToString() is string dn
+                                    )
+                                    {
+                                        displayName = dn;
+                                        goto ADD_DISPLAY_NAME;
+                                    }
+                                }
+                            }
+
+                            break;
                         }
                     }
                 }
 
                 ADD_DISPLAY_NAME:
                 {
-                    if (displayName is not null)
+                    if (displayName is not null && isDisplayAttributeUsed == false)
                     {
-                        isDisplayNameTheFirstPresence = displayNames.Add(displayName);
+                        isDisplayAttributeUsed = true;
                     }
 
                     var nameByteCount = GetByteCount(member.Name);
@@ -109,7 +130,10 @@ namespace ZBase.Foundation.EnumExtensions
                     var byteCount = Math.Max(nameByteCount, displayNameByteCount);
                     maxByteCount = Math.Max(maxByteCount, byteCount);
 
-                    members.Add((member.Name, new EnumValueOption(displayName, isDisplayNameTheFirstPresence)));
+                    members.Add(new EnumMemberDeclaration {
+                        name = member.Name,
+                        displayName = displayName,
+                    });
                     continue;
                 }
 
@@ -119,8 +143,7 @@ namespace ZBase.Foundation.EnumExtensions
                 }
             }
 
-            Members = new EquatableArray<(string Key, EnumValueOption Value)>(members.ToArray());
-            IsDisplayAttributeUsed = displayNames.Count > 0;
+            IsDisplayAttributeUsed = isDisplayAttributeUsed;
 
             if (ReferenceUnityCollections)
             {
@@ -140,6 +163,12 @@ namespace ZBase.Foundation.EnumExtensions
                 return 0;
 
             return Encoding.UTF8.GetByteCount(value);
+        }
+
+        public struct EnumMemberDeclaration
+        {
+            public string name;
+            public string displayName;
         }
     }
 }
