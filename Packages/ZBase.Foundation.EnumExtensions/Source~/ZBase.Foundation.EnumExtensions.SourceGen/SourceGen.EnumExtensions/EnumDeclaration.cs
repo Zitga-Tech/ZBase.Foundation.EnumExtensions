@@ -147,7 +147,7 @@ namespace ZBase.Foundation.EnumExtensions
 
             if (ReferenceUnityCollections)
             {
-                FixedStringTypeName = maxByteCount switch {
+                FixedStringTypeName = (maxByteCount + 3) switch {
                     <= 32 => "global::Unity.Collections.FixedString32Bytes",
                     <= 64 => "global::Unity.Collections.FixedString64Bytes",
                     <= 128 => "global::Unity.Collections.FixedString128Bytes",
