@@ -8,29 +8,33 @@ namespace ZBase.Foundation.EnumExtensions
 {
     public partial class EnumDeclaration
     {
-        public string ExtensionsName { get; private set; }
+        public string ExtensionsName { get; }
 
-        public bool ParentIsNamespace { get; private set; }
+        public bool ParentIsNamespace { get;  }
 
-        public string FullyQualifiedName { get; private set; }
+        public string Name { get; }
+        
+        public string FullyQualifiedName { get; }
 
-        public string UnderlyingTypeName { get; private set; }
+        public string UnderlyingTypeName { get; }
 
-        public List<EnumMemberDeclaration> Members { get; private set; }
+        public List<EnumMemberDeclaration> Members { get; }
 
-        public Accessibility Accessibility { get; private set; }
+        public Accessibility Accessibility { get; }
 
-        public bool HasFlags { get; private set; }
+        public bool HasFlags { get; }
 
-        public bool ReferenceUnityCollections { get; private set; }
+        public bool ReferenceUnityCollections { get; }
 
-        public string FixedStringTypeName { get; private set; }
+        public string FixedStringTypeName { get; }
 
-        public bool IsDisplayAttributeUsed { get; private set; }
+        public string FixedStringTypeFullyQualifiedName { get; }
 
-        public bool OnlyNames { get; private set; }
+        public bool IsDisplayAttributeUsed { get; }
 
-        public bool NoDocumentation { get; private set; }
+        public bool OnlyNames { get; }
+
+        public bool NoDocumentation { get; }
 
         public EnumDeclaration(
               INamedTypeSymbol symbol
@@ -42,6 +46,7 @@ namespace ZBase.Foundation.EnumExtensions
         {
             ExtensionsName = extensionsName;
             ParentIsNamespace = parentIsNamespace;
+            Name = symbol.Name;
             FullyQualifiedName = symbol.ToFullName();
             UnderlyingTypeName = symbol.EnumUnderlyingType.ToString();
             Accessibility = accessibility;
@@ -148,12 +153,14 @@ namespace ZBase.Foundation.EnumExtensions
             if (ReferenceUnityCollections)
             {
                 FixedStringTypeName = (maxByteCount + 3) switch {
-                    <= 32 => "global::Unity.Collections.FixedString32Bytes",
-                    <= 64 => "global::Unity.Collections.FixedString64Bytes",
-                    <= 128 => "global::Unity.Collections.FixedString128Bytes",
-                    <= 512 => "global::Unity.Collections.FixedString512Bytes",
-                    _ => "global::Unity.Collections.FixedString4096Bytes",
+                    <= 32 => "FixedString32Bytes",
+                    <= 64 => "FixedString64Bytes",
+                    <= 128 => "FixedString128Bytes",
+                    <= 512 => "FixedString512Bytes",
+                    _ => "FixedString4096Bytes",
                 };
+
+                FixedStringTypeFullyQualifiedName = $"global::Unity.Collections.{FixedStringTypeName}";
             }
         }
 

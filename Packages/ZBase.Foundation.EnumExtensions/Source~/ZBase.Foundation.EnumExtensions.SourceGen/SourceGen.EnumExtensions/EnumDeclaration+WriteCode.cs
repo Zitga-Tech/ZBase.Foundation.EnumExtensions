@@ -23,20 +23,208 @@ namespace ZBase.Foundation.EnumExtensions
             p = p.IncreasedIndent();
             {
                 p.PrintEndLine();
-
-                p.PrintBeginLine("[global::ZBase.Foundation.EnumExtensions.SourceGen.GeneratedEnumExtensionsFor(typeof(")
-                    .Print(FullyQualifiedName)
-                    .PrintEndLine("))]");
-
-                WriteCode(ref p);
+                WriteInterface(ref p);
+                WriteStruct(ref p);
+                WriteClass(ref p);
             }
             p = p.DecreasedIndent();
 
             return p.Result;
         }
 
-        private void WriteCode(ref Printer p)
+        private void WriteAttribute(ref Printer p)
         {
+            p.PrintBeginLine("[global::ZBase.Foundation.EnumExtensions.SourceGen.GeneratedEnumExtensionsFor(typeof(")
+                .Print(FullyQualifiedName).Print("), typeof(I")
+                .Print(ExtensionsName).Print("), typeof(")
+                .Print(ExtensionsName).Print("), typeof(")
+                .Print(ExtensionsName).Print("Wrapper)")
+                .PrintEndLine(")]");
+        }
+
+        private void WriteInterface(ref Printer p)
+        {
+            WriteAttribute(ref p);
+
+            p.PrintLine(GENERATED_CODE);
+            p.PrintBeginLine(GetKeyword(Accessibility)).Print(" partial interface I").PrintEndLine(ExtensionsName);
+            p = p.IncreasedIndent();
+            {
+                p.PrintBeginLine(": global::ZBase.Foundation.EnumExtensions.IEnumExtensions<")
+                    .Print(FullyQualifiedName).Print(", ").Print(UnderlyingTypeName)
+                    .PrintEndLine(">");
+
+                if (ReferenceUnityCollections)
+                {
+                    p.PrintBeginLine(", global::ZBase.Foundation.EnumExtensions.ITo")
+                        .PrintEndLine(FixedStringTypeName);
+                }
+            }
+            p = p.DecreasedIndent();
+            p.OpenScope();
+            {
+            }
+            p.CloseScope();
+            p.PrintEndLine();
+        }
+
+        private void WriteStruct(ref Printer p)
+        {
+            WriteAttribute(ref p);
+
+            p.PrintLine(GENERATED_CODE);
+            p.PrintLine("[global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit)]");
+            p.PrintBeginLine(GetKeyword(Accessibility)).Print(" readonly partial struct ").Print(ExtensionsName).Print("Wrapper")
+                .Print(" : I").PrintEndLine(ExtensionsName);
+            p = p.IncreasedIndent();
+            {
+                p.PrintBeginLine(", global::System.IEquatable<").Print(ExtensionsName).PrintEndLine("Wrapper>");
+                p.PrintBeginLine(", global::System.IComparable<").Print(ExtensionsName).PrintEndLine("Wrapper>");
+            }
+            p = p.DecreasedIndent();
+            p.OpenScope();
+            {
+                p.PrintLine(GENERATED_CODE);
+                p.PrintLine("[global::System.Runtime.InteropServices.FieldOffset(0)]");
+                p.PrintBeginLine("public readonly ").Print(FullyQualifiedName).PrintEndLine(" Value;");
+                p.PrintEndLine();
+                
+                p.PrintLine(GENERATED_CODE);
+                p.PrintLine("[global::System.Runtime.InteropServices.FieldOffset(0)]");
+                p.PrintBeginLine("public readonly ").Print(UnderlyingTypeName).PrintEndLine(" UnderlyingValue;");
+                p.PrintEndLine();
+
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public ").Print(ExtensionsName).Print("Wrapper(")
+                    .Print(FullyQualifiedName).PrintEndLine(" value) : this()");
+                p.OpenScope();
+                {
+                    p.PrintLine("this.Value = value;");
+                }
+                p.CloseScope();
+                p.PrintEndLine();
+
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public string ToStringFast() => ")
+                    .Print(ExtensionsName).PrintEndLine(".ToStringFast(this.Value);");
+                p.PrintEndLine();
+
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public string ToDisplayStringFast() => ")
+                    .Print(ExtensionsName).PrintEndLine(".ToDisplayStringFast(this.Value);");
+                p.PrintEndLine();
+
+                if (ReferenceUnityCollections)
+                {
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintBeginLine("public ").Print(FixedStringTypeFullyQualifiedName).Print(" ToFixedStringFast() => ")
+                        .Print(ExtensionsName).PrintEndLine(".ToFixedStringFast(this.Value);");
+                    p.PrintEndLine();
+
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintBeginLine("public ").Print(FixedStringTypeFullyQualifiedName).Print(" ToFixedDisplayStringFast() => ")
+                        .Print(ExtensionsName).PrintEndLine(".ToFixedDisplayStringFast(this.Value);");
+                    p.PrintEndLine();
+                }
+
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public ").Print(UnderlyingTypeName).Print(" ToUnderlyingValue() => ")
+                    .Print(ExtensionsName).PrintEndLine(".ToUnderlyingValue(this.Value);");
+                p.PrintEndLine();
+
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintLine("public bool TryFormat(");
+                p = p.IncreasedIndent();
+                {
+                    p.PrintLine("  global::System.Span<char> destination");
+                    p.PrintLine(", out int charsWritten");
+                    p.PrintLine(", global::System.ReadOnlySpan<char> format = default");
+                    p.PrintLine(", global::System.IFormatProvider provider = null");
+                }
+                p = p.DecreasedIndent();
+                p.PrintBeginLine(") => ").Print(ExtensionsName)
+                    .PrintEndLine(".TryFormat(this.Value, destination, out charsWritten, format, provider);");
+                p.PrintEndLine();
+
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public bool IsDefined() => ")
+                    .Print(ExtensionsName).PrintEndLine(".IsDefined(this.Value);");
+                p.PrintEndLine();
+                
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public bool IsDefinedIn(string name) => ")
+                    .Print(ExtensionsName).Print(".IsDefinedIn(name, default(")
+                    .Print(FullyQualifiedName).PrintEndLine("));");
+                p.PrintEndLine();
+
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public bool IsDefinedIn(string name, bool allowMatchingMetadataAttribute) => ")
+                    .Print(ExtensionsName).Print(".IsDefinedIn(name, default(")
+                    .Print(FullyQualifiedName).PrintEndLine("), allowMatchingMetadataAttribute);");
+                p.PrintEndLine();
+
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public override string ToString() => ")
+                    .Print(ExtensionsName).PrintEndLine(".ToStringFast(this.Value);");
+                p.PrintEndLine();
+                
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintLine("public override int GetHashCode() => this.Value.GetHashCode();");
+                p.PrintEndLine();
+
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public int CompareTo(").Print(ExtensionsName)
+                    .PrintEndLine("Wrapper other) => this.UnderlyingValue.CompareTo(other.UnderlyingValue);");
+                p.PrintEndLine();
+
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public bool Equals(").Print(ExtensionsName)
+                    .PrintEndLine("Wrapper other) => this.UnderlyingValue == other.UnderlyingValue;");
+                p.PrintEndLine();
+                
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public override bool Equals(object obj) => obj is ").Print(ExtensionsName)
+                    .PrintEndLine("Wrapper other && this.UnderlyingValue == other.UnderlyingValue;");
+                p.PrintEndLine();
+
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public static implicit operator ")
+                    .Print(ExtensionsName).Print("Wrapper(").Print(FullyQualifiedName)
+                    .Print(" value) => new ").Print(ExtensionsName).PrintEndLine("Wrapper(value);");
+                p.PrintEndLine();
+
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public static bool operator ==(")
+                    .Print(ExtensionsName).Print("Wrapper left, ")
+                    .Print(ExtensionsName).PrintEndLine("Wrapper right) => left.UnderlyingValue == right.UnderlyingValue;");
+                p.PrintEndLine();
+
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public static bool operator !=(")
+                    .Print(ExtensionsName).Print("Wrapper left, ")
+                    .Print(ExtensionsName).PrintEndLine("Wrapper right) => left.UnderlyingValue != right.UnderlyingValue;");
+                p.PrintEndLine();
+
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public static bool operator <(")
+                    .Print(ExtensionsName).Print("Wrapper left, ")
+                    .Print(ExtensionsName).PrintEndLine("Wrapper right) => left.UnderlyingValue < right.UnderlyingValue;");
+                p.PrintEndLine();
+
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public static bool operator >(")
+                    .Print(ExtensionsName).Print("Wrapper left, ")
+                    .Print(ExtensionsName).PrintEndLine("Wrapper right) => left.UnderlyingValue > right.UnderlyingValue;");
+                p.PrintEndLine();
+            }
+            p.CloseScope();
+            p.PrintEndLine();
+        }
+
+        private void WriteClass(ref Printer p)
+        {
+            WriteAttribute(ref p);
+
             var @this = ParentIsNamespace ? "this " : "";
 
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
@@ -98,11 +286,11 @@ namespace ZBase.Foundation.EnumExtensions
                 foreach (var member in Members)
                 {
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static {FixedStringTypeName} {member.name}");
+                    p.PrintLine($"public static {FixedStringTypeFullyQualifiedName} {member.name}");
                     p.OpenScope();
                     {
                         p.PrintLine(AGGRESSIVE_INLINING);
-                        p.PrintLine($"get => ({FixedStringTypeName}){CLASS_DISPLAY_NAMES}.{member.name};");
+                        p.PrintLine($"get => ({FixedStringTypeFullyQualifiedName}){CLASS_DISPLAY_NAMES}.{member.name};");
                     }
                     p.CloseScope();
                     p.PrintEndLine();
@@ -111,10 +299,10 @@ namespace ZBase.Foundation.EnumExtensions
                 if (OnlyNames == false)
                 {
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static global::Unity.Collections.NativeArray<{FixedStringTypeName}>.ReadOnly AsNativeArray({UNITY_COLLECTIONS_ALLOCATOR} allocator)");
+                    p.PrintLine($"public static global::Unity.Collections.NativeArray<{FixedStringTypeFullyQualifiedName}>.ReadOnly AsNativeArray({UNITY_COLLECTIONS_ALLOCATOR} allocator)");
                     p.OpenScope();
                     {
-                        p.PrintLine($"var names = global::Unity.Collections.CollectionHelper.CreateNativeArray<{FixedStringTypeName}>({ExtensionsName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
+                        p.PrintLine($"var names = global::Unity.Collections.CollectionHelper.CreateNativeArray<{FixedStringTypeFullyQualifiedName}>({ExtensionsName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
 
                         var index = 0;
 
@@ -136,7 +324,7 @@ namespace ZBase.Foundation.EnumExtensions
                 }
 
                 p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                p.PrintLine($"public static {FixedStringTypeName} Get({FullyQualifiedName} value)");
+                p.PrintLine($"public static {FixedStringTypeFullyQualifiedName} Get({FullyQualifiedName} value)");
                 p = p.IncreasedIndent();
                 p.PrintLine($"=> value switch");
                 p.OpenScope();
@@ -169,11 +357,11 @@ namespace ZBase.Foundation.EnumExtensions
                 foreach (var member in Members)
                 {
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static {FixedStringTypeName} {member.name}");
+                    p.PrintLine($"public static {FixedStringTypeFullyQualifiedName} {member.name}");
                     p.OpenScope();
                     {
                         p.PrintLine(AGGRESSIVE_INLINING);
-                        p.PrintLine($"get => ({FixedStringTypeName}){CLASS_NAMES}.{member.name};");
+                        p.PrintLine($"get => ({FixedStringTypeFullyQualifiedName}){CLASS_NAMES}.{member.name};");
                     }
                     p.CloseScope();
                     p.PrintEndLine();
@@ -182,10 +370,10 @@ namespace ZBase.Foundation.EnumExtensions
                 if (OnlyNames == false)
                 {
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static global::Unity.Collections.NativeArray<{FixedStringTypeName}>.ReadOnly AsNativeArray({UNITY_COLLECTIONS_ALLOCATOR} allocator)");
+                    p.PrintLine($"public static global::Unity.Collections.NativeArray<{FixedStringTypeFullyQualifiedName}>.ReadOnly AsNativeArray({UNITY_COLLECTIONS_ALLOCATOR} allocator)");
                     p.OpenScope();
                     {
-                        p.PrintLine($"var names = global::Unity.Collections.CollectionHelper.CreateNativeArray<{FixedStringTypeName}>({ExtensionsName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
+                        p.PrintLine($"var names = global::Unity.Collections.CollectionHelper.CreateNativeArray<{FixedStringTypeFullyQualifiedName}>({ExtensionsName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
 
                         var index = 0;
 
@@ -207,7 +395,7 @@ namespace ZBase.Foundation.EnumExtensions
                 }
 
                 p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                p.PrintLine($"public static {FixedStringTypeName} Get({FullyQualifiedName} value)");
+                p.PrintLine($"public static {FixedStringTypeFullyQualifiedName} Get({FullyQualifiedName} value)");
                 p = p.IncreasedIndent();
                 p.PrintLine($"=> value switch");
                 p.OpenScope();
@@ -905,7 +1093,7 @@ namespace ZBase.Foundation.EnumExtensions
             }
 
             p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-            p.PrintLine($"public static {FixedStringTypeName} ToFixedStringFast({@this}{FullyQualifiedName} value)");
+            p.PrintLine($"public static {FixedStringTypeFullyQualifiedName} ToFixedStringFast({@this}{FullyQualifiedName} value)");
             p = p.IncreasedIndent();
             p.PrintBeginLine("=> ").Print(CLASS_FIXED_NAMES).PrintEndLine(".Get(value);");
             p = p.DecreasedIndent();
@@ -924,17 +1112,17 @@ namespace ZBase.Foundation.EnumExtensions
             }
 
             p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-            p.PrintLine($"public static {FixedStringTypeName} ToFixedDisplayStringFast({@this}{FullyQualifiedName} value)");
+            p.PrintLine($"public static {FixedStringTypeFullyQualifiedName} ToFixedDisplayStringFast({@this}{FullyQualifiedName} value)");
             p = p.IncreasedIndent();
             p.PrintBeginLine("=> ").Print(CLASS_FIXED_DISPLAY_NAMES).PrintEndLine(".Get(value);");
             p = p.DecreasedIndent();
             p.PrintEndLine();
 
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-            p.PrintLine($"private static {FixedStringTypeName} ToFixedString({UnderlyingTypeName} value)");
+            p.PrintLine($"private static {FixedStringTypeFullyQualifiedName} ToFixedString({UnderlyingTypeName} value)");
             p.OpenScope();
             {
-                p.PrintLine($"var fs = new {FixedStringTypeName}();");
+                p.PrintLine($"var fs = new {FixedStringTypeFullyQualifiedName}();");
                 p.PrintLine("global::Unity.Collections.FixedStringMethods.Append(ref fs, value);");
                 p.PrintLine("return fs;");
             }
