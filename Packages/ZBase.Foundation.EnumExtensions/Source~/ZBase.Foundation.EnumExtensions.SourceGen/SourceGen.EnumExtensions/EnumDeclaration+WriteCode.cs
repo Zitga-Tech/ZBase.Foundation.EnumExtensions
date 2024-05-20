@@ -11,6 +11,7 @@ namespace ZBase.Foundation.EnumExtensions
         private const string UNITY_COLLECTIONS_ALLOCATOR = "global::Unity.Collections.AllocatorManager.AllocatorHandle";
         private const string CLASS_VALUES = "Values";
         private const string CLASS_UNDERLYING_VALUES = "UnderlyingValues";
+        private const string CLASS_WRAPPERS = "Wrappers";
         private const string CLASS_NAMES = "Names";
         private const string CLASS_DISPLAY_NAMES = "DisplayNames";
         private const string CLASS_FIXED_NAMES = "FixedNames";
@@ -23,8 +24,13 @@ namespace ZBase.Foundation.EnumExtensions
             p = p.IncreasedIndent();
             {
                 p.PrintEndLine();
-                WriteInterface(ref p);
-                WriteStruct(ref p);
+
+                if (OnlyNames == false)
+                {
+                    WriteInterface(ref p);
+                    WriteStruct(ref p);
+                }
+
                 WriteClass(ref p);
             }
             p = p.DecreasedIndent();
@@ -34,11 +40,16 @@ namespace ZBase.Foundation.EnumExtensions
 
         private void WriteAttribute(ref Printer p)
         {
+            if (OnlyNames)
+            {
+                return;
+            }
+
             p.PrintBeginLine("[global::ZBase.Foundation.EnumExtensions.SourceGen.GeneratedEnumExtensionsFor(typeof(")
                 .Print(FullyQualifiedName).Print("), typeof(I")
                 .Print(ExtensionsName).Print("), typeof(")
                 .Print(ExtensionsName).Print("), typeof(")
-                .Print(ExtensionsName).Print("Wrapper)")
+                .Print(ExtensionsWrapperName).Print(")")
                 .PrintEndLine(")]");
         }
 
@@ -74,12 +85,12 @@ namespace ZBase.Foundation.EnumExtensions
 
             p.PrintLine(GENERATED_CODE);
             p.PrintLine("[global::System.Runtime.InteropServices.StructLayout(global::System.Runtime.InteropServices.LayoutKind.Explicit)]");
-            p.PrintBeginLine(GetKeyword(Accessibility)).Print(" readonly partial struct ").Print(ExtensionsName).Print("Wrapper")
+            p.PrintBeginLine(GetKeyword(Accessibility)).Print(" readonly partial struct ").Print(ExtensionsWrapperName)
                 .Print(" : I").PrintEndLine(ExtensionsName);
             p = p.IncreasedIndent();
             {
-                p.PrintBeginLine(", global::System.IEquatable<").Print(ExtensionsName).PrintEndLine("Wrapper>");
-                p.PrintBeginLine(", global::System.IComparable<").Print(ExtensionsName).PrintEndLine("Wrapper>");
+                p.PrintBeginLine(", global::System.IEquatable<").Print(ExtensionsWrapperName).PrintEndLine(">");
+                p.PrintBeginLine(", global::System.IComparable<").Print(ExtensionsWrapperName).PrintEndLine(">");
             }
             p = p.DecreasedIndent();
             p.OpenScope();
@@ -95,7 +106,7 @@ namespace ZBase.Foundation.EnumExtensions
                 p.PrintEndLine();
 
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                p.PrintBeginLine("public ").Print(ExtensionsName).Print("Wrapper(")
+                p.PrintBeginLine("public ").Print(ExtensionsWrapperName).Print("(")
                     .Print(FullyQualifiedName).PrintEndLine(" value) : this()");
                 p.OpenScope();
                 {
@@ -169,52 +180,52 @@ namespace ZBase.Foundation.EnumExtensions
                 p.PrintEndLine();
                 
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                p.PrintLine("public override int GetHashCode() => this.Value.GetHashCode();");
+                p.PrintLine("public override int GetHashCode() => this.UnderlyingValue.GetHashCode();");
                 p.PrintEndLine();
 
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                p.PrintBeginLine("public int CompareTo(").Print(ExtensionsName)
-                    .PrintEndLine("Wrapper other) => this.UnderlyingValue.CompareTo(other.UnderlyingValue);");
+                p.PrintBeginLine("public int CompareTo(").Print(ExtensionsWrapperName)
+                    .PrintEndLine(" other) => this.UnderlyingValue.CompareTo(other.UnderlyingValue);");
                 p.PrintEndLine();
 
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                p.PrintBeginLine("public bool Equals(").Print(ExtensionsName)
-                    .PrintEndLine("Wrapper other) => this.UnderlyingValue == other.UnderlyingValue;");
+                p.PrintBeginLine("public bool Equals(").Print(ExtensionsWrapperName)
+                    .PrintEndLine(" other) => this.UnderlyingValue == other.UnderlyingValue;");
                 p.PrintEndLine();
                 
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                p.PrintBeginLine("public override bool Equals(object obj) => obj is ").Print(ExtensionsName)
-                    .PrintEndLine("Wrapper other && this.UnderlyingValue == other.UnderlyingValue;");
+                p.PrintBeginLine("public override bool Equals(object obj) => obj is ").Print(ExtensionsWrapperName)
+                    .PrintEndLine(" other && this.UnderlyingValue == other.UnderlyingValue;");
                 p.PrintEndLine();
 
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                 p.PrintBeginLine("public static implicit operator ")
-                    .Print(ExtensionsName).Print("Wrapper(").Print(FullyQualifiedName)
-                    .Print(" value) => new ").Print(ExtensionsName).PrintEndLine("Wrapper(value);");
+                    .Print(ExtensionsWrapperName).Print("(").Print(FullyQualifiedName)
+                    .Print(" value) => new ").Print(ExtensionsWrapperName).PrintEndLine("(value);");
                 p.PrintEndLine();
 
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                 p.PrintBeginLine("public static bool operator ==(")
-                    .Print(ExtensionsName).Print("Wrapper left, ")
-                    .Print(ExtensionsName).PrintEndLine("Wrapper right) => left.UnderlyingValue == right.UnderlyingValue;");
+                    .Print(ExtensionsWrapperName).Print(" left, ")
+                    .Print(ExtensionsWrapperName).PrintEndLine(" right) => left.UnderlyingValue == right.UnderlyingValue;");
                 p.PrintEndLine();
 
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                 p.PrintBeginLine("public static bool operator !=(")
-                    .Print(ExtensionsName).Print("Wrapper left, ")
-                    .Print(ExtensionsName).PrintEndLine("Wrapper right) => left.UnderlyingValue != right.UnderlyingValue;");
+                    .Print(ExtensionsWrapperName).Print(" left, ")
+                    .Print(ExtensionsWrapperName).PrintEndLine(" right) => left.UnderlyingValue != right.UnderlyingValue;");
                 p.PrintEndLine();
 
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                 p.PrintBeginLine("public static bool operator <(")
-                    .Print(ExtensionsName).Print("Wrapper left, ")
-                    .Print(ExtensionsName).PrintEndLine("Wrapper right) => left.UnderlyingValue < right.UnderlyingValue;");
+                    .Print(ExtensionsWrapperName).Print(" left, ")
+                    .Print(ExtensionsWrapperName).PrintEndLine(" right) => left.UnderlyingValue < right.UnderlyingValue;");
                 p.PrintEndLine();
 
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                 p.PrintBeginLine("public static bool operator >(")
-                    .Print(ExtensionsName).Print("Wrapper left, ")
-                    .Print(ExtensionsName).PrintEndLine("Wrapper right) => left.UnderlyingValue > right.UnderlyingValue;");
+                    .Print(ExtensionsWrapperName).Print(" left, ")
+                    .Print(ExtensionsWrapperName).PrintEndLine(" right) => left.UnderlyingValue > right.UnderlyingValue;");
                 p.PrintEndLine();
             }
             p.CloseScope();
@@ -244,6 +255,16 @@ namespace ZBase.Foundation.EnumExtensions
                 p.PrintEndLine();
 
                 WriteToString(ref p, @this);
+
+                if (OnlyNames == false)
+                {
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine($"public static {ExtensionsWrapperName} AsExtensionsWrapper({@this}{FullyQualifiedName} value)");
+                    p = p.IncreasedIndent();
+                    p.PrintLine($"=> new {ExtensionsWrapperName}(value);");
+                    p = p.DecreasedIndent();
+                    p.PrintEndLine();
+                }
 
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                 p.PrintLine($"public static {UnderlyingTypeName} ToUnderlyingValue({@this}{FullyQualifiedName} value)");
@@ -571,7 +592,7 @@ namespace ZBase.Foundation.EnumExtensions
             p.CloseScope();
             p.PrintEndLine();
         }
-
+        
         private void WriteClassValues(ref Printer p)
         {
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);

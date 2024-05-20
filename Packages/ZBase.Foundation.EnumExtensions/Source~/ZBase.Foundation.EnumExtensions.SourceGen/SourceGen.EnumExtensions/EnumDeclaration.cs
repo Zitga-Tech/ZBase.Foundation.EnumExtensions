@@ -9,6 +9,8 @@ namespace ZBase.Foundation.EnumExtensions
     public partial class EnumDeclaration
     {
         public string ExtensionsName { get; }
+        
+        public string ExtensionsWrapperName { get; }
 
         public bool ParentIsNamespace { get;  }
 
@@ -45,6 +47,7 @@ namespace ZBase.Foundation.EnumExtensions
         )
         {
             ExtensionsName = extensionsName;
+            ExtensionsWrapperName = $"{extensionsName}Wrapper";
             ParentIsNamespace = parentIsNamespace;
             Name = symbol.Name;
             FullyQualifiedName = symbol.ToFullName();
