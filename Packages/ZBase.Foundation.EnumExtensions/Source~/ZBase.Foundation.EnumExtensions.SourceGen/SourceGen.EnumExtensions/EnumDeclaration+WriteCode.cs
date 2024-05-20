@@ -17,6 +17,10 @@ namespace ZBase.Foundation.EnumExtensions
         private const string CLASS_FIXED_NAMES = "FixedNames";
         private const string CLASS_FIXED_DISPLAY_NAMES = "FixedDisplayNames";
 
+        private static readonly string[] s_primitiveTypes = new string[] {
+            "byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong"
+        };
+
         public string WriteCode()
         {
             var p = Printer.DefaultLarge;
@@ -262,6 +266,16 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine($"public static {ExtensionsWrapperName} AsExtensionsWrapper({@this}{FullyQualifiedName} value)");
                     p = p.IncreasedIndent();
                     p.PrintLine($"=> new {ExtensionsWrapperName}(value);");
+                    p = p.DecreasedIndent();
+                    p.PrintEndLine();
+                }
+
+                foreach (var type in s_primitiveTypes)
+                {
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine($"public static {ExtensionsWrapperName} As{ExtensionsWrapperName}({@this}{type} value)");
+                    p = p.IncreasedIndent();
+                    p.PrintLine($"=> new {ExtensionsWrapperName}(({FullyQualifiedName})({UnderlyingTypeName})value);");
                     p = p.DecreasedIndent();
                     p.PrintEndLine();
                 }
