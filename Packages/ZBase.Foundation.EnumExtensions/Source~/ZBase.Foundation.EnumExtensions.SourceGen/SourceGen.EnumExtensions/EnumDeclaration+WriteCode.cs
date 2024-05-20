@@ -288,6 +288,7 @@ namespace ZBase.Foundation.EnumExtensions
                 p.PrintEndLine();
 
                 WriteTryParse(ref p, @this);
+                WriteTryParseSpan(ref p, @this);
 
                 if (OnlyNames == false)
                 {
@@ -840,6 +841,225 @@ namespace ZBase.Foundation.EnumExtensions
                         }
 
                         p.PrintLine($"case string s when {UnderlyingTypeName}.TryParse(name, out var underlyingValue):");
+                        p.OpenScope();
+                        {
+                            p.PrintLine($"value = ({FullyQualifiedName})underlyingValue;");
+                            p.PrintLine("return true;");
+                        }
+                        p.CloseScope();
+
+                        p.PrintLine("default:");
+                        p.OpenScope();
+                        {
+                            p.PrintLine("value = default;");
+                            p.PrintLine("return false;");
+                        }
+                        p.CloseScope();
+                    }
+                    p.CloseScope();
+                }
+                p.CloseScope();
+            }
+            p.CloseScope();
+            p.PrintEndLine();
+        }
+
+        private void WriteTryParseSpan(ref Printer p, string @this)
+        {
+            const string SPAN = "global::System.ReadOnlySpan<char>";
+
+            if (NoDocumentation == false)
+            {
+                p.PrintLine("/// <summary>");
+                p.PrintLine("/// Converts the string representation of the name or numeric value of");
+                p.PrintLine($"/// an <see cref=\"{FullyQualifiedName}\" /> to the equivalent instance.");
+                p.PrintLine("/// The return value indicates whether the conversion succeeded.");
+                p.PrintLine("/// </summary>");
+                p.PrintLine("/// <param name=\"name\">The case-sensitive string representation of the enumeration name or underlying value to convert</param>");
+                p.PrintLine("/// <param name=\"value\">When this method returns, contains an object of type ");
+                p.PrintLine($"/// <see cref=\"{FullyQualifiedName}\" /> whose");
+                p.PrintLine("/// value is represented by <paramref name=\"value\"/> if the parse operation succeeds.");
+                p.PrintLine("/// If the parse operation fails, contains the default value of the underlying type");
+                p.PrintLine($"/// of <see cref=\"{FullyQualifiedName}\" />. This parameter is passed uninitialized.</param>");
+                p.PrintLine("/// <returns><c>true</c> if the value parameter was converted successfully; otherwise, <c>false</c>.</returns>");
+            }
+
+            p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public static bool TryParse({@this}{SPAN} name, out {FullyQualifiedName} value)");
+            p = p.IncreasedIndent();
+            p.PrintLine("=> TryParse(name, out value, false, false);");
+            p = p.DecreasedIndent();
+            p.PrintEndLine();
+
+            if (NoDocumentation == false)
+            {
+                p.PrintLine("/// <summary>");
+                p.PrintLine("/// Converts the string representation of the name or numeric value of");
+                p.PrintLine($"/// an <see cref=\"{FullyQualifiedName}\" /> to the equivalent instance.");
+                p.PrintLine("/// The return value indicates whether the conversion succeeded.");
+                p.PrintLine("/// </summary>");
+                p.PrintLine("/// <param name=\"name\">The case-sensitive string representation of the enumeration name or underlying value to convert</param>");
+                p.PrintLine("/// <param name=\"value\">When this method returns, contains an object of type ");
+                p.PrintLine($"/// <see cref=\"{FullyQualifiedName}\" /> whose");
+                p.PrintLine("/// value is represented by <paramref name=\"value\"/> if the parse operation succeeds.");
+                p.PrintLine("/// If the parse operation fails, contains the default value of the underlying type");
+                p.PrintLine($"/// of <see cref=\"{FullyQualifiedName}\" />. This parameter is passed uninitialized.</param>");
+                p.PrintLine("/// <param name=\"ignoreCase\"><c>true</c> to read value in case insensitive mode; <c>false</c> to read value in case sensitive mode.</param>");
+                p.PrintLine("/// <returns><c>true</c> if the value parameter was converted successfully; otherwise, <c>false</c>.</returns>");
+            }
+
+            p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public static bool TryParse({@this}{SPAN} name, out {FullyQualifiedName} value, bool ignoreCase)");
+            p = p.IncreasedIndent();
+            p.PrintLine("=> TryParse(name, out value, ignoreCase, false);");
+            p = p.DecreasedIndent();
+            p.PrintEndLine();
+
+            if (NoDocumentation == false)
+            {
+                p.PrintLine("/// <summary>");
+                p.PrintLine("/// Converts the string representation of the name or numeric value of");
+                p.PrintLine($"/// an <see cref=\"{FullyQualifiedName}\" /> to the equivalent instance.");
+                p.PrintLine("/// The return value indicates whether the conversion succeeded.");
+                p.PrintLine("/// </summary>");
+                p.PrintLine("/// <param name=\"name\">The case-sensitive string representation of the enumeration name or underlying value to convert</param>");
+                p.PrintLine("/// <param name=\"value\">When this method returns, contains an object of type ");
+                p.PrintLine($"/// <see cref=\"{FullyQualifiedName}\" /> whose");
+                p.PrintLine("/// value is represented by <paramref name=\"value\"/> if the parse operation succeeds.");
+                p.PrintLine("/// If the parse operation fails, contains the default value of the underlying type");
+                p.PrintLine($"/// of <see cref=\"{FullyQualifiedName}\" />. This parameter is passed uninitialized.</param>");
+                p.PrintLine("/// <param name=\"ignoreCase\"><c>true</c> to read value in case insensitive mode; <c>false</c> to read value in case sensitive mode.</param>");
+                p.PrintLine("/// <param name=\"allowMatchingMetadataAttribute\">If <c>true</c>, considers the value included in metadata attributes such as");
+                p.PrintLine("/// <c>[Display]</c> attribute when parsing, otherwise only considers the member names.</param>");
+                p.PrintLine("/// <returns><c>true</c> if the value parameter was converted successfully; otherwise, <c>false</c>.</returns>");
+            }
+
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public static bool TryParse({@this}{SPAN} name, out {FullyQualifiedName} value, bool ignoreCase, bool allowMatchingMetadataAttribute)");
+            p.OpenScope();
+            {
+                p.PrintLine("if (name.IsEmpty)");
+                p.OpenScope();
+                {
+                    p.PrintLine("value = default;");
+                    p.PrintLine("return false;");
+                }
+                p.CloseScope();
+                p.PrintEndLine();
+
+                if (IsDisplayAttributeUsed)
+                {
+                    p.PrintLine("if (allowMatchingMetadataAttribute)");
+                    p.OpenScope();
+                    {
+                        p.PrintLine("if (ignoreCase)");
+                        p.OpenScope();
+                        {
+                            p.PrintLine("switch (name)");
+                            p.OpenScope();
+                            {
+                                foreach (var member in Members)
+                                {
+                                    if (member.displayName is not null)
+                                    {
+                                        p.PrintLine($"case {SPAN} s when global::System.MemoryExtensions.Equals(s, global::System.MemoryExtensions.AsSpan({CLASS_DISPLAY_NAMES}.{member.name}), global::System.StringComparison.OrdinalIgnoreCase):");
+                                        p.OpenScope();
+                                        {
+                                            p.PrintLine($"value = {FullyQualifiedName}.{member.name};");
+                                            p.PrintLine("return true;");
+                                        }
+                                        p.CloseScope();
+                                    }
+                                }
+
+                                p.PrintLine("default: break;");
+                            }
+                            p.CloseScope();
+                        }
+                        p.CloseScope();
+                        p.PrintLine("else");
+                        p.OpenScope();
+                        {
+                            p.PrintLine("switch (name)");
+                            p.OpenScope();
+                            {
+                                foreach (var member in Members)
+                                {
+                                    if (member.displayName is not null)
+                                    {
+                                        p.PrintLine($"case {SPAN} s when global::System.MemoryExtensions.Equals(s, global::System.MemoryExtensions.AsSpan({CLASS_DISPLAY_NAMES}.{member.name}), global::System.StringComparison.Ordinal):");
+                                        p.OpenScope();
+                                        {
+                                            p.PrintLine($"value = {FullyQualifiedName}.{member.name};");
+                                            p.PrintLine("return true;");
+                                        }
+                                        p.CloseScope();
+                                    }
+                                }
+
+                                p.PrintLine("default: break;");
+                            }
+                            p.CloseScope();
+                        }
+                        p.CloseScope();
+                    }
+                    p.CloseScope();
+                }
+
+                p.PrintLine("if (ignoreCase)");
+                p.OpenScope();
+                {
+                    p.PrintLine("switch (name)");
+                    p.OpenScope();
+                    {
+                        foreach (var member in Members)
+                        {
+                            p.PrintLine($"case {SPAN} s when global::System.MemoryExtensions.Equals(s, global::System.MemoryExtensions.AsSpan({CLASS_NAMES}.{member.name}), global::System.StringComparison.OrdinalIgnoreCase):");
+                            p.OpenScope();
+                            {
+                                p.PrintLine($"value = {FullyQualifiedName}.{member.name};");
+                                p.PrintLine("return true;");
+                            }
+                            p.CloseScope();
+                        }
+
+                        p.PrintLine($"case {SPAN} s when {UnderlyingTypeName}.TryParse(name, out var underlyingValue):");
+                        p.OpenScope();
+                        {
+                            p.PrintLine($"value = ({FullyQualifiedName})underlyingValue;");
+                            p.PrintLine("return true;");
+                        }
+                        p.CloseScope();
+
+                        p.PrintLine("default:");
+                        p.OpenScope();
+                        {
+                            p.PrintLine("value = default;");
+                            p.PrintLine("return false;");
+                        }
+                        p.CloseScope();
+                    }
+                    p.CloseScope();
+                }
+                p.CloseScope();
+                p.PrintLine("else");
+                p.OpenScope();
+                {
+                    p.PrintLine("switch (name)");
+                    p.OpenScope();
+                    {
+                        foreach (var member in Members)
+                        {
+                            p.PrintLine($"case {SPAN} s when global::System.MemoryExtensions.Equals(s, global::System.MemoryExtensions.AsSpan({CLASS_NAMES}.{member.name}), global::System.StringComparison.Ordinal):");
+                            p.OpenScope();
+                            {
+                                p.PrintLine($"value = {FullyQualifiedName}.{member.name};");
+                                p.PrintLine("return true;");
+                            }
+                            p.CloseScope();
+                        }
+
+                        p.PrintLine($"case {SPAN} s when {UnderlyingTypeName}.TryParse(name, out var underlyingValue):");
                         p.OpenScope();
                         {
                             p.PrintLine($"value = ({FullyQualifiedName})underlyingValue;");

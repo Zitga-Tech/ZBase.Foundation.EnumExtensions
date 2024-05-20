@@ -1,3 +1,4 @@
+using System;
 using Unity.Burst;
 using Unity.Jobs;
 using Unity.Logging;
@@ -10,7 +11,14 @@ namespace EnumExtensionsTests
     {
         private void Start()
         {
-            Debug.Log(ComponentTypeExtensions.ToStringFast(ComponentType.SpriteRenderer));
+            Debug.Log($"ToStringFast: {ComponentTypeExtensions.ToStringFast(ComponentType.SpriteRenderer)}");
+
+            const string ASSERT = "Assert";
+
+            if (ASSERT.AsSpan().TryParse(out LogType value, true, false))
+            {
+                Debug.Log($"TryParse: {value}");
+            }
 
             var job = new MyJob();
             job.Schedule();
