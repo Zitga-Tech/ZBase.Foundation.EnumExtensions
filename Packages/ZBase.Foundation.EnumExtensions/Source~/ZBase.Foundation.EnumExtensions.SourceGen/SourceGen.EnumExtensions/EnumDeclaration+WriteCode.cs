@@ -268,16 +268,16 @@ namespace ZBase.Foundation.EnumExtensions
                     p.PrintLine($"=> new {ExtensionsWrapperName}(value);");
                     p = p.DecreasedIndent();
                     p.PrintEndLine();
-                }
 
-                foreach (var type in s_primitiveTypes)
-                {
-                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static {ExtensionsWrapperName} As{ExtensionsWrapperName}({@this}{type} value)");
-                    p = p.IncreasedIndent();
-                    p.PrintLine($"=> new {ExtensionsWrapperName}(({FullyQualifiedName})({UnderlyingTypeName})value);");
-                    p = p.DecreasedIndent();
-                    p.PrintEndLine();
+                    foreach (var type in s_primitiveTypes)
+                    {
+                        p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                        p.PrintLine($"public static {ExtensionsWrapperName} As{ExtensionsWrapperName}({@this}{type} value)");
+                        p = p.IncreasedIndent();
+                        p.PrintLine($"=> new {ExtensionsWrapperName}(({FullyQualifiedName})({UnderlyingTypeName})value);");
+                        p = p.DecreasedIndent();
+                        p.PrintEndLine();
+                    }
                 }
 
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
