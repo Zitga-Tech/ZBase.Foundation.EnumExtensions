@@ -1,7 +1,7 @@
 {
   "name": "com.zbase.foundation.enum-extensions",
   "displayName": "ZBase.Foundation.EnumExtensions",
-  "version": "1.3.6",
+  "version": "1.3.7",
   "unity": "2022.2",
   "documentationUrl": "https://github.com/Zitga-Tech/ZBase.Foundation.EnumExtensions/blob/main/README.md",
   "type": "library"
