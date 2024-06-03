@@ -91,6 +91,7 @@ namespace ZBase.Foundation.EnumExtensions
                             goto CONTINUE;
                         }
 
+                        case "DescriptionAttribute":
                         case "DisplayAttribute":
                         case "DisplayNameAttribute":
                         case "InspectorNameAttribute":
