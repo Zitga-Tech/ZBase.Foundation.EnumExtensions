@@ -294,6 +294,7 @@ namespace ZBase.Foundation.EnumExtensions
                 {
                     WriteTryFormat(ref p, @this);
                     WriteIsDefined(ref p, @this);
+                    WriteFindIndex(ref p, @this);
                     WriteFlags(ref p, @this);
                     WriteClassValues(ref p);
                     WriteClassUnderlyingValues(ref p);
@@ -1244,6 +1245,40 @@ namespace ZBase.Foundation.EnumExtensions
                 p.CloseScope("};");
             }
             p.CloseScope();
+            p.PrintEndLine();
+        }
+
+        private void WriteFindIndex(ref Printer p, string @this)
+        {
+            if (NoDocumentation == false)
+            {
+                p.PrintLine("/// <summary>");
+                p.PrintLine("/// Finds the index for a given enum value in the enumeration.");
+                p.PrintLine("/// </summary>");
+                p.PrintLine("/// <param name=\"value\">The value to find the index for</param>");
+                p.PrintLine("/// <returns>The zero-based index if the enum value exists in the enumeration, otherwise -1.</returns>");
+            }
+
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public static int FindIndex({@this}{FullyQualifiedName} value)");
+            p = p.IncreasedIndent();
+            {
+                p.PrintLine("=> value switch");
+                p.OpenScope();
+                {
+                    var members = Members;
+                    var count = members.Count;
+
+                    for (var i = 0; i < count; i++)
+                    {
+                        p.PrintLine($"{FullyQualifiedName}.{members[i].name} => {i},");
+                    }
+
+                    p.PrintLine("_ => -1,");
+                }
+                p.CloseScope("};");
+            }
+            p = p.DecreasedIndent();
             p.PrintEndLine();
         }
 
