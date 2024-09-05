@@ -7,13 +7,20 @@ using Unity.Collections;
 namespace ZBase.Foundation.EnumExtensions
 {
     public interface IEnumExtensions<TEnum, TUnderlyingValue>
-        : IToString
+        : IHasLength
+        , IToString
         , IToUnderlyingValue<TUnderlyingValue>
         , ITryFormat
         , IIsDefined
+        , IFindIndex
         where TEnum : struct, Enum
         where TUnderlyingValue : unmanaged
     { }
+
+    public interface IHasLength
+    {
+        int Length { get; }
+    }
 
     public interface IToString
     {
@@ -44,6 +51,11 @@ namespace ZBase.Foundation.EnumExtensions
         bool IsDefinedIn(string name);
 
         bool IsDefinedIn(string name, bool allowMatchingMetadataAttribute);
+    }
+
+    public interface IFindIndex
+    {
+        int FindIndex();
     }
 
 #if UNITY_COLLECTIONS

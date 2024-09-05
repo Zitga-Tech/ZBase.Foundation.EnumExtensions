@@ -119,6 +119,16 @@ namespace ZBase.Foundation.EnumExtensions
                 p.CloseScope();
                 p.PrintEndLine();
 
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintLine("public int Length");
+                p.OpenScope();
+                {
+                    p.PrintLine(AGGRESSIVE_INLINING);
+                    p.PrintBeginLine("get => ").Print(ExtensionsName).PrintEndLine(".Length;");
+                }
+                p.CloseScope();
+                p.PrintEndLine();
+
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                 p.PrintBeginLine("public string ToStringFast() => ")
                     .Print(ExtensionsName).PrintEndLine(".ToStringFast(this.Value);");
@@ -176,6 +186,11 @@ namespace ZBase.Foundation.EnumExtensions
                 p.PrintBeginLine("public bool IsDefinedIn(string name, bool allowMatchingMetadataAttribute) => ")
                     .Print(ExtensionsName).Print(".IsDefinedIn(name, default(")
                     .Print(FullyQualifiedName).PrintEndLine("), allowMatchingMetadataAttribute);");
+                p.PrintEndLine();
+
+                p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintBeginLine("public int FindIndex() => ")
+                    .Print(ExtensionsName).PrintEndLine(".FindIndex(this.Value);");
                 p.PrintEndLine();
 
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
