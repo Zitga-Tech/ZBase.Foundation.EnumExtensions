@@ -6,20 +6,26 @@ namespace ZBase.Foundation.EnumExtensions
     partial class EnumDeclaration
     {
         private const string GENERATED_CODE = "[global::System.CodeDom.Compiler.GeneratedCode(\"ZBase.Foundation.EnumExtensions.EnumExtensionsGenerator\", \"1.2.2\")]";
-        private const string AGGRESSIVE_INLINING = "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]";
+
+        private const string AGGRESSIVE_INLINING =
+            "[global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]";
+
         private const string EXCLUDE_COVERAGE = "[global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]";
         private const string UNITY_COLLECTIONS_ALLOCATOR = "global::Unity.Collections.AllocatorManager.AllocatorHandle";
         private const string CLASS_VALUES = "Values";
         private const string CLASS_UNDERLYING_VALUES = "UnderlyingValues";
         private const string CLASS_WRAPPERS = "Wrappers";
         private const string CLASS_NAMES = "Names";
+        private const string CLASS_LOWER_CASE = "LowerCaseNames";
+        private const string CLASS_UPPER_CASE = "UpperCaseNames";
+        private const string CLASS_TITLE_CASE = "TitleCaseNames";
+        private const string CLASS_SENTENCE_CASE = "SentenceCaseNames";
+        private const string CLASS_SNAKE_CASE = "SnakeCaseNames";
         private const string CLASS_DISPLAY_NAMES = "DisplayNames";
         private const string CLASS_FIXED_NAMES = "FixedNames";
         private const string CLASS_FIXED_DISPLAY_NAMES = "FixedDisplayNames";
 
-        private static readonly string[] s_primitiveTypes = new string[] {
-            "byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong"
-        };
+        private static readonly string[] s_primitiveTypes = new string[] {"byte", "sbyte", "short", "ushort", "int", "uint", "long", "ulong"};
 
         public string WriteCode()
         {
@@ -103,7 +109,7 @@ namespace ZBase.Foundation.EnumExtensions
                 p.PrintLine("[global::System.Runtime.InteropServices.FieldOffset(0)]");
                 p.PrintBeginLine("public readonly ").Print(FullyQualifiedName).PrintEndLine(" Value;");
                 p.PrintEndLine();
-                
+
                 p.PrintLine(GENERATED_CODE);
                 p.PrintLine("[global::System.Runtime.InteropServices.FieldOffset(0)]");
                 p.PrintBeginLine("public readonly ").Print(UnderlyingTypeName).PrintEndLine(" UnderlyingValue;");
@@ -175,7 +181,7 @@ namespace ZBase.Foundation.EnumExtensions
                 p.PrintBeginLine("public bool IsDefined() => ")
                     .Print(ExtensionsName).PrintEndLine(".IsDefined(this.Value);");
                 p.PrintEndLine();
-                
+
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                 p.PrintBeginLine("public bool IsDefinedIn(string name) => ")
                     .Print(ExtensionsName).Print(".IsDefinedIn(name, default(")
@@ -197,7 +203,7 @@ namespace ZBase.Foundation.EnumExtensions
                 p.PrintBeginLine("public override string ToString() => ")
                     .Print(ExtensionsName).PrintEndLine(".ToStringFast(this.Value);");
                 p.PrintEndLine();
-                
+
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                 p.PrintLine("public override int GetHashCode() => this.UnderlyingValue.GetHashCode();");
                 p.PrintEndLine();
@@ -211,7 +217,7 @@ namespace ZBase.Foundation.EnumExtensions
                 p.PrintBeginLine("public bool Equals(").Print(ExtensionsWrapperName)
                     .PrintEndLine(" other) => this.UnderlyingValue == other.UnderlyingValue;");
                 p.PrintEndLine();
-                
+
                 p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
                 p.PrintBeginLine("public override bool Equals(object obj) => obj is ").Print(ExtensionsWrapperName)
                     .PrintEndLine(" other && this.UnderlyingValue == other.UnderlyingValue;");
@@ -274,6 +280,11 @@ namespace ZBase.Foundation.EnumExtensions
                 p.PrintEndLine();
 
                 WriteToString(ref p, @this);
+                WriteToLowercase(ref p, @this);
+                WriteToUppercase(ref p, @this);
+                WriteToTitleCase(ref p, @this);
+                WriteToSentenceCase(ref p, @this);
+                WriteToSnakeCase(ref p, @this);
 
                 if (OnlyNames == false)
                 {
@@ -319,6 +330,12 @@ namespace ZBase.Foundation.EnumExtensions
                 WriteClassDisplayNames(ref p);
                 WriteClassFixedNames(ref p);
                 WriteClassFixedDisplayNames(ref p);
+                
+                WriteClassLowercase(ref p);
+                WriteClassUppercase(ref p);
+                WriteClassTitleCase(ref p);
+                WriteClassSentenceCase(ref p);
+                WriteClassSnakeCase(ref p);
             }
             p.CloseScope();
             p.PrintEndLine();
@@ -351,10 +368,12 @@ namespace ZBase.Foundation.EnumExtensions
                 if (OnlyNames == false)
                 {
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static global::Unity.Collections.NativeArray<{FixedStringTypeFullyQualifiedName}>.ReadOnly AsNativeArray({UNITY_COLLECTIONS_ALLOCATOR} allocator)");
+                    p.PrintLine(
+                        $"public static global::Unity.Collections.NativeArray<{FixedStringTypeFullyQualifiedName}>.ReadOnly AsNativeArray({UNITY_COLLECTIONS_ALLOCATOR} allocator)");
                     p.OpenScope();
                     {
-                        p.PrintLine($"var names = global::Unity.Collections.CollectionHelper.CreateNativeArray<{FixedStringTypeFullyQualifiedName}>({ExtensionsName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
+                        p.PrintLine(
+                            $"var names = global::Unity.Collections.CollectionHelper.CreateNativeArray<{FixedStringTypeFullyQualifiedName}>({ExtensionsName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
 
                         var index = 0;
 
@@ -422,10 +441,12 @@ namespace ZBase.Foundation.EnumExtensions
                 if (OnlyNames == false)
                 {
                     p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
-                    p.PrintLine($"public static global::Unity.Collections.NativeArray<{FixedStringTypeFullyQualifiedName}>.ReadOnly AsNativeArray({UNITY_COLLECTIONS_ALLOCATOR} allocator)");
+                    p.PrintLine(
+                        $"public static global::Unity.Collections.NativeArray<{FixedStringTypeFullyQualifiedName}>.ReadOnly AsNativeArray({UNITY_COLLECTIONS_ALLOCATOR} allocator)");
                     p.OpenScope();
                     {
-                        p.PrintLine($"var names = global::Unity.Collections.CollectionHelper.CreateNativeArray<{FixedStringTypeFullyQualifiedName}>({ExtensionsName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
+                        p.PrintLine(
+                            $"var names = global::Unity.Collections.CollectionHelper.CreateNativeArray<{FixedStringTypeFullyQualifiedName}>({ExtensionsName}.Length, allocator, global::Unity.Collections.NativeArrayOptions.UninitializedMemory);");
 
                         var index = 0;
 
@@ -584,6 +605,281 @@ namespace ZBase.Foundation.EnumExtensions
             p.CloseScope();
             p.PrintEndLine();
         }
+        
+        private void WriteClassLowercase(ref Printer p)
+        {
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintBeginLine("public static partial class ").PrintEndLine(CLASS_LOWER_CASE);
+            p.OpenScope();
+            {
+                foreach (var member in Members)
+                {
+                    p.PrintLine(GENERATED_CODE);
+                    p.PrintLine($"public const string {member.name} = \"{member.name.ToLowerInvariant()}\";");
+                    p.PrintEndLine();
+                }
+
+                if (OnlyNames == false)
+                {
+                    p.PrintLine($"private static readonly string[] s_names = new string[]");
+                    p.OpenScope();
+                    {
+                        foreach (var member in Members)
+                        {
+                            p.PrintLine($"{member.name},");
+                        }
+                    }
+                    p.CloseScope("};");
+                    p.PrintEndLine();
+
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine("public static global::System.ReadOnlyMemory<string> AsMemory() => s_names;");
+                    p.PrintEndLine();
+
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine("public static global::System.ReadOnlySpan<string> AsSpan() => s_names;");
+                    p.PrintEndLine();
+                }
+
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintLine($"public static string GetLowercase({FullyQualifiedName} value)");
+                p = p.IncreasedIndent();
+                p.PrintLine("=> value switch");
+                p.OpenScope();
+                {
+                    foreach (var member in Members)
+                    {
+                        p.PrintLine($"{FullyQualifiedName}.{member.name} => {member.name},");
+                    }
+
+                    p.PrintLine("_ => ToUnderlyingValue(value).ToString(),");
+                }
+                p.CloseScope("};");
+                p = p.DecreasedIndent();
+            }
+            p.CloseScope();
+            p.PrintEndLine();
+        }
+        
+        private void WriteClassUppercase(ref Printer p)
+        {
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintBeginLine("public static partial class ").PrintEndLine(CLASS_UPPER_CASE);
+            p.OpenScope();
+            {
+                foreach (var member in Members)
+                {
+                    p.PrintLine(GENERATED_CODE);
+                    p.PrintLine($"public const string {member.name} = \"{member.name.ToUpperInvariant()}\";");
+                    p.PrintEndLine();
+                }
+
+                if (OnlyNames == false)
+                {
+                    p.PrintLine($"private static readonly string[] s_names = new string[]");
+                    p.OpenScope();
+                    {
+                        foreach (var member in Members)
+                        {
+                            p.PrintLine($"{member.name},");
+                        }
+                    }
+                    p.CloseScope("};");
+                    p.PrintEndLine();
+
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine("public static global::System.ReadOnlyMemory<string> AsMemory() => s_names;");
+                    p.PrintEndLine();
+
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine("public static global::System.ReadOnlySpan<string> AsSpan() => s_names;");
+                    p.PrintEndLine();
+                }
+
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintLine($"public static string GetUppercase({FullyQualifiedName} value)");
+                p = p.IncreasedIndent();
+                p.PrintLine("=> value switch");
+                p.OpenScope();
+                {
+                    foreach (var member in Members)
+                    {
+                        p.PrintLine($"{FullyQualifiedName}.{member.name} => {member.name},");
+                    }
+
+                    p.PrintLine("_ => ToUnderlyingValue(value).ToString(),");
+                }
+                p.CloseScope("};");
+                p = p.DecreasedIndent();
+            }
+            p.CloseScope();
+            p.PrintEndLine();
+        }
+        
+        private void WriteClassTitleCase(ref Printer p)
+        {
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintBeginLine("public static partial class ").PrintEndLine(CLASS_TITLE_CASE);
+            p.OpenScope();
+            {
+                foreach (var member in Members)
+                {
+                    p.PrintLine(GENERATED_CODE);
+                    p.PrintLine($"public const string {member.name} = \"{member.name.ToTitleCase()}\";");
+                    p.PrintEndLine();
+                }
+
+                if (OnlyNames == false)
+                {
+                    p.PrintLine($"private static readonly string[] s_names = new string[]");
+                    p.OpenScope();
+                    {
+                        foreach (var member in Members)
+                        {
+                            p.PrintLine($"{member.name},");
+                        }
+                    }
+                    p.CloseScope("};");
+                    p.PrintEndLine();
+
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine("public static global::System.ReadOnlyMemory<string> AsMemory() => s_names;");
+                    p.PrintEndLine();
+
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine("public static global::System.ReadOnlySpan<string> AsSpan() => s_names;");
+                    p.PrintEndLine();
+                }
+
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintLine($"public static string GetTitleCase({FullyQualifiedName} value)");
+                p = p.IncreasedIndent();
+                p.PrintLine("=> value switch");
+                p.OpenScope();
+                {
+                    foreach (var member in Members)
+                    {
+                        p.PrintLine($"{FullyQualifiedName}.{member.name} => {member.name},");
+                    }
+
+                    p.PrintLine("_ => ToUnderlyingValue(value).ToString(),");
+                }
+                p.CloseScope("};");
+                p = p.DecreasedIndent();
+            }
+            p.CloseScope();
+            p.PrintEndLine();
+        }
+
+        private void WriteClassSentenceCase(ref Printer p)
+        {
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintBeginLine("public static partial class ").PrintEndLine(CLASS_SENTENCE_CASE);
+            p.OpenScope();
+            {
+                foreach (var member in Members)
+                {
+                    p.PrintLine(GENERATED_CODE);
+                    p.PrintLine($"public const string {member.name} = \"{member.name.ToSentenceCase()}\";");
+                    p.PrintEndLine();
+                }
+
+                if (OnlyNames == false)
+                {
+                    p.PrintLine($"private static readonly string[] s_names = new string[]");
+                    p.OpenScope();
+                    {
+                        foreach (var member in Members)
+                        {
+                            p.PrintLine($"{member.name},");
+                        }
+                    }
+                    p.CloseScope("};");
+                    p.PrintEndLine();
+
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine("public static global::System.ReadOnlyMemory<string> AsMemory() => s_names;");
+                    p.PrintEndLine();
+
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine("public static global::System.ReadOnlySpan<string> AsSpan() => s_names;");
+                    p.PrintEndLine();
+                }
+
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintLine($"public static string GetSentenceCase({FullyQualifiedName} value)");
+                p = p.IncreasedIndent();
+                p.PrintLine("=> value switch");
+                p.OpenScope();
+                {
+                    foreach (var member in Members)
+                    {
+                        p.PrintLine($"{FullyQualifiedName}.{member.name} => {member.name},");
+                    }
+
+                    p.PrintLine("_ => ToUnderlyingValue(value).ToString(),");
+                }
+                p.CloseScope("};");
+                p = p.DecreasedIndent();
+            }
+            p.CloseScope();
+            p.PrintEndLine();
+        }
+
+        private void WriteClassSnakeCase(ref Printer p)
+        {
+            p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintBeginLine("public static partial class ").PrintEndLine(CLASS_SNAKE_CASE);
+            p.OpenScope();
+            {
+                foreach (var member in Members)
+                {
+                    p.PrintLine(GENERATED_CODE);
+                    p.PrintLine($"public const string {member.name} = \"{member.name.ToSnakeCase()}\";");
+                    p.PrintEndLine();
+                }
+
+                if (OnlyNames == false)
+                {
+                    p.PrintLine($"private static readonly string[] s_names = new string[]");
+                    p.OpenScope();
+                    {
+                        foreach (var member in Members)
+                        {
+                            p.PrintLine($"{member.name},");
+                        }
+                    }
+                    p.CloseScope("};");
+                    p.PrintEndLine();
+
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine("public static global::System.ReadOnlyMemory<string> AsMemory() => s_names;");
+                    p.PrintEndLine();
+
+                    p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                    p.PrintLine("public static global::System.ReadOnlySpan<string> AsSpan() => s_names;");
+                    p.PrintEndLine();
+                }
+
+                p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+                p.PrintLine($"public static string GetSnakeCase({FullyQualifiedName} value)");
+                p = p.IncreasedIndent();
+                p.PrintLine("=> value switch");
+                p.OpenScope();
+                {
+                    foreach (var member in Members)
+                    {
+                        p.PrintLine($"{FullyQualifiedName}.{member.name} => {member.name},");
+                    }
+
+                    p.PrintLine("_ => ToUnderlyingValue(value).ToString(),");
+                }
+                p.CloseScope("};");
+                p = p.DecreasedIndent();
+            }
+            p.CloseScope();
+            p.PrintEndLine();
+        }
 
         private void WriteClassUnderlyingValues(ref Printer p)
         {
@@ -623,7 +919,7 @@ namespace ZBase.Foundation.EnumExtensions
             p.CloseScope();
             p.PrintEndLine();
         }
-        
+
         private void WriteClassValues(ref Printer p)
         {
             p.PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
@@ -978,7 +1274,8 @@ namespace ZBase.Foundation.EnumExtensions
                                 {
                                     if (member.displayName is not null)
                                     {
-                                        p.PrintLine($"case {SPAN} s when global::System.MemoryExtensions.Equals(s, global::System.MemoryExtensions.AsSpan({CLASS_DISPLAY_NAMES}.{member.name}), global::System.StringComparison.OrdinalIgnoreCase):");
+                                        p.PrintLine(
+                                            $"case {SPAN} s when global::System.MemoryExtensions.Equals(s, global::System.MemoryExtensions.AsSpan({CLASS_DISPLAY_NAMES}.{member.name}), global::System.StringComparison.OrdinalIgnoreCase):");
                                         p.OpenScope();
                                         {
                                             p.PrintLine($"value = {FullyQualifiedName}.{member.name};");
@@ -1003,7 +1300,8 @@ namespace ZBase.Foundation.EnumExtensions
                                 {
                                     if (member.displayName is not null)
                                     {
-                                        p.PrintLine($"case {SPAN} s when global::System.MemoryExtensions.Equals(s, global::System.MemoryExtensions.AsSpan({CLASS_DISPLAY_NAMES}.{member.name}), global::System.StringComparison.Ordinal):");
+                                        p.PrintLine(
+                                            $"case {SPAN} s when global::System.MemoryExtensions.Equals(s, global::System.MemoryExtensions.AsSpan({CLASS_DISPLAY_NAMES}.{member.name}), global::System.StringComparison.Ordinal):");
                                         p.OpenScope();
                                         {
                                             p.PrintLine($"value = {FullyQualifiedName}.{member.name};");
@@ -1030,7 +1328,8 @@ namespace ZBase.Foundation.EnumExtensions
                     {
                         foreach (var member in Members)
                         {
-                            p.PrintLine($"case {SPAN} s when global::System.MemoryExtensions.Equals(s, global::System.MemoryExtensions.AsSpan({CLASS_NAMES}.{member.name}), global::System.StringComparison.OrdinalIgnoreCase):");
+                            p.PrintLine(
+                                $"case {SPAN} s when global::System.MemoryExtensions.Equals(s, global::System.MemoryExtensions.AsSpan({CLASS_NAMES}.{member.name}), global::System.StringComparison.OrdinalIgnoreCase):");
                             p.OpenScope();
                             {
                                 p.PrintLine($"value = {FullyQualifiedName}.{member.name};");
@@ -1066,7 +1365,8 @@ namespace ZBase.Foundation.EnumExtensions
                     {
                         foreach (var member in Members)
                         {
-                            p.PrintLine($"case {SPAN} s when global::System.MemoryExtensions.Equals(s, global::System.MemoryExtensions.AsSpan({CLASS_NAMES}.{member.name}), global::System.StringComparison.Ordinal):");
+                            p.PrintLine(
+                                $"case {SPAN} s when global::System.MemoryExtensions.Equals(s, global::System.MemoryExtensions.AsSpan({CLASS_NAMES}.{member.name}), global::System.StringComparison.Ordinal):");
                             p.OpenScope();
                             {
                                 p.PrintLine($"value = {FullyQualifiedName}.{member.name};");
@@ -1111,7 +1411,8 @@ namespace ZBase.Foundation.EnumExtensions
                 p.PrintLine("/// <summary>");
                 p.PrintLine("/// Determines whether some of the bit fields are set in the current instance.");
                 p.PrintLine("/// </summary>");
-                p.PrintLine("/// <returns><c>true</c> if all of the bit fields that are set in <c>flag</c> are also set in the current instance; otherwise, <c>false</c>.</returns>");
+                p.PrintLine(
+                    "/// <returns><c>true</c> if all of the bit fields that are set in <c>flag</c> are also set in the current instance; otherwise, <c>false</c>.</returns>");
             }
 
             p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
@@ -1126,7 +1427,8 @@ namespace ZBase.Foundation.EnumExtensions
                 p.PrintLine("/// <summary>");
                 p.PrintLine("/// Determines whether any of the bit fields are set in the current instance.");
                 p.PrintLine("/// </summary>");
-                p.PrintLine("/// <returns><c>true</c> if any of the bit fields that are set in <c>flag</c> is also set in the current instance; otherwise, <c>false</c>.</returns>");
+                p.PrintLine(
+                    "/// <returns><c>true</c> if any of the bit fields that are set in <c>flag</c> is also set in the current instance; otherwise, <c>false</c>.</returns>");
             }
 
             p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
@@ -1432,6 +1734,101 @@ namespace ZBase.Foundation.EnumExtensions
                 p.PrintLine("return fs;");
             }
             p.CloseScope();
+            p.PrintEndLine();
+        }
+        
+        private void WriteToLowercase(ref Printer p, string @this)
+        {
+            if (NoDocumentation == false)
+            {
+                p.PrintLine("/// <summary>");
+                p.PrintLine($"/// Returns the lowercase string representation of the <see cref=\"{FullyQualifiedName}\"/> value.");
+                p.PrintLine("/// </summary>");
+                p.PrintLine("/// <param name=\"value\">The value to retrieve the string value for</param>");
+                p.PrintLine("/// <returns>The lowercase string representation of the value</returns>");
+            }
+
+            p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public static string ToLowercaseFast({@this}{FullyQualifiedName} value)");
+            p = p.IncreasedIndent();
+            p.PrintBeginLine("=> ").Print(CLASS_LOWER_CASE).PrintEndLine(".GetLowercase(value);");
+            p = p.DecreasedIndent();
+            p.PrintEndLine();
+        }
+        
+        private void WriteToUppercase(ref Printer p, string @this)
+        {
+            if (NoDocumentation == false)
+            {
+                p.PrintLine("/// <summary>");
+                p.PrintLine($"/// Returns the uppercase string representation of the <see cref=\"{FullyQualifiedName}\"/> value.");
+                p.PrintLine("/// </summary>");
+                p.PrintLine("/// <param name=\"value\">The value to retrieve the string value for</param>");
+                p.PrintLine("/// <returns>The uppercase string representation of the value</returns>");
+            }
+
+            p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public static string ToUppercaseFast({@this}{FullyQualifiedName} value)");
+            p = p.IncreasedIndent();
+            p.PrintBeginLine("=> ").Print(CLASS_UPPER_CASE).PrintEndLine(".GetUppercase(value);");
+            p = p.DecreasedIndent();
+            p.PrintEndLine();
+        }
+        
+        private void WriteToTitleCase(ref Printer p, string @this)
+        {
+            if (NoDocumentation == false)
+            {
+                p.PrintLine("/// <summary>");
+                p.PrintLine($"/// Returns the title case string representation of the <see cref=\"{FullyQualifiedName}\"/> value.");
+                p.PrintLine("/// </summary>");
+                p.PrintLine("/// <param name=\"value\">The value to retrieve the string value for</param>");
+                p.PrintLine("/// <returns>The title case string representation of the value</returns>");
+            }
+
+            p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public static string ToTitleCaseFast({@this}{FullyQualifiedName} value)");
+            p = p.IncreasedIndent();
+            p.PrintBeginLine("=> ").Print(CLASS_TITLE_CASE).PrintEndLine(".GetTitleCase(value);");
+            p = p.DecreasedIndent();
+            p.PrintEndLine();
+        }
+        
+        private void WriteToSentenceCase(ref Printer p, string @this)
+        {
+            if (NoDocumentation == false)
+            {
+                p.PrintLine("/// <summary>");
+                p.PrintLine($"/// Returns the sentence case string representation of the <see cref=\"{FullyQualifiedName}\"/> value.");
+                p.PrintLine("/// </summary>");
+                p.PrintLine("/// <param name=\"value\">The value to retrieve the string value for</param>");
+                p.PrintLine("/// <returns>The sentence case string representation of the value</returns>");
+            }
+
+            p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public static string ToSentenceCaseFast({@this}{FullyQualifiedName} value)");
+            p = p.IncreasedIndent();
+            p.PrintBeginLine("=> ").Print(CLASS_SENTENCE_CASE).PrintEndLine(".GetSentenceCase(value);");
+            p = p.DecreasedIndent();
+            p.PrintEndLine();
+        }
+        
+        private void WriteToSnakeCase(ref Printer p, string @this)
+        {
+            if (NoDocumentation == false)
+            {
+                p.PrintLine("/// <summary>");
+                p.PrintLine($"/// Returns the snake case string representation of the <see cref=\"{FullyQualifiedName}\"/> value.");
+                p.PrintLine("/// </summary>");
+                p.PrintLine("/// <param name=\"value\">The value to retrieve the string value for</param>");
+                p.PrintLine("/// <returns>The snake case string representation of the value</returns>");
+            }
+
+            p.PrintLine(AGGRESSIVE_INLINING).PrintLine(GENERATED_CODE).PrintLine(EXCLUDE_COVERAGE);
+            p.PrintLine($"public static string ToSnakeCaseFast({@this}{FullyQualifiedName} value)");
+            p = p.IncreasedIndent();
+            p.PrintBeginLine("=> ").Print(CLASS_SNAKE_CASE).PrintEndLine(".GetSnakeCase(value);");
+            p = p.DecreasedIndent();
             p.PrintEndLine();
         }
 
