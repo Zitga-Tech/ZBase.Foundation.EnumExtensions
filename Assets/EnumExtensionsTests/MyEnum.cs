@@ -25,4 +25,7 @@ namespace EnumExtensionsTests
     }
 
     static partial class MyFlagsExtensions { }
+    
+    [EnumExtensions]
+    public enum MyEnum2 { _FirstCase, SecondCase, Third_Case, forth_case, fifthCase }
 }
